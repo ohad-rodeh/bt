@@ -1,0 +1,2 @@
+s:^CFLAGS:# CFLAGS:g
+

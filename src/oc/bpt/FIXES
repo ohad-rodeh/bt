@@ -1,0 +1,12 @@
+FIXES
+-----
+
+A list of fixes that should go back into the main b-tree implementation. 
+
+* Much quicker testing with lookup-range. This makes
+   the comparison between the linked-list and b-tree much faster. 
+
+TODO
+* Validate also makes sure tree-depth is correct. 
+
+
