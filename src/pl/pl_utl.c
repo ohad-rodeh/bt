@@ -90,7 +90,7 @@ Pl_utl_config pl_utl_cfg = {0,
                             0,
                             0,                            
                             {pthread_create_fun,
-                             disk_rw,
+                             NULL, //disk_rw
                              pl_utl_bsema_i_create,
                              pl_utl_bsema_i_destroy,
                              pl_utl_bsema_i_post,
@@ -243,6 +243,7 @@ static Pl_utl_io_rc disk_rw(Pl_utl_disk_desc *disk_p,
                             int len,
                             int buf_ofs)
 {
+#if 0
     int fd = disk_p->fd;
     char *buf_p = (char*) _buf_p;
     int rc, accu;
@@ -318,7 +319,9 @@ static Pl_utl_io_rc disk_rw(Pl_utl_disk_desc *disk_p,
             }
         }
     }
-    
+#endif
+
+    ss_assert(0);
     return PL_UTL_IO_RC_SUCCESS;
 }
 
