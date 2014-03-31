@@ -29,74 +29,46 @@
  * 
  */
 /**************************************************************/
-/* PL_BASE.H
+/**********************************************************************/
+/* OC_XT_OP_STAT.C  
+ *
+ * Compute statistics on a given b+-tree
  */
+/**********************************************************************/
+#ifndef OC_XT_OP_STAT_H
+#define OC_XT_OP_STAT_H
 
-#ifndef PL_BASE_H
-#define PL_BASE_H
+typedef struct Oc_xt_statistics {
+    // Total number of keys, nodes
+    uint32 num_extents; // extents stored in the leaves
+    uint32 num_nodes; // root, index and leaves
+    uint32 num_leaves; // leaves only
+    uint32 num_indexnodes; //index only
+    uint32 num_pointers; // total number of pointers in the tree
 
-#include <assert.h>
-#include <stdio.h>
-#include <stdint.h>
+    // Tree Depth
+    uint32 depth; // global tree depth
+    uint32 tmp_depth; // temporary variable to store the local depth 
 
+    uint32 root_fanout;
+    
+    // Internal node fanout;
+    double avg_fanout;
+    uint32 max_fanout;
+    uint32 min_fanout;
 
-#define ss_assert assert
+    // Leaf capacity;
+    double avg_leafcap;
+    uint32 max_leafcap;
+    uint32 min_leafcap;
+    
+} Oc_xt_statistics;
 
-#if OC_DEBUG
-#define ss_debugassert(cond) assert(cond)
-#else
-#define ss_debugassert(cond)
-#endif
-
-#define WRN(msg) { printf("\n"); printf msg; printf("\n"); fflush(stdout); }
-#define ERR(msg) { printf("\n"); printf msg; printf("\n"); fflush(stdout); ss_assert(0);}
-
-// Constants
-#define KB (1024)
-#define MB (KB*KB)
-#define GB (MB*KB)
-
-#define SS_PAGE_SIZE        4096
-#define SS_SECTOR_SIZE      512
-#define SS_SECTORS_PER_PAGE 8
-
-#ifndef TRUE
-#define TRUE 1
-#endif
-
-#ifndef FALSE
-#define FALSE 0
-#endif
-
-#ifndef offsetof
-#define offsetof(TYPE,MEMBER) ((uint32) &((TYPE *)0)->MEMBER)
-#endif
-
-#ifndef NULL
-#if defined(__cplusplus)
-#define NULL 0
-#else
-#define NULL ((void *)0)
-#endif
-#endif
-
-// Types
-typedef unsigned char      uchar;
-typedef signed   char      int8;
-typedef unsigned char      uint8; 
-typedef signed   short     int16;
-typedef unsigned short     uint16;   
-typedef signed   long      int32;
-typedef unsigned long      uint32;   
-/*  This atrib must be left off until we resolve alignment issues   */
-typedef signed long long   int64;   /* __attribute__((aligned(8))); */
-typedef unsigned long long uint64;  /* __attribute__((aligned(8))); */
-
-#ifndef __cplusplus
-typedef int32              bool;
-#endif
-
-typedef uint8              bool8;
+// Traverses the tree and collects its statistics
+void oc_xt_op_statistics_b(
+    struct Oc_wu *wu_p,
+    Oc_xt_state *s_p,
+    Oc_xt_statistics *st_p);
 
 #endif
 

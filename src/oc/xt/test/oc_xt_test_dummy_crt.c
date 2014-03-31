@@ -29,76 +29,52 @@
  * 
  */
 /**************************************************************/
-/* PL_BASE.H
- */
-
-#ifndef PL_BASE_H
-#define PL_BASE_H
-
-#include <assert.h>
-#include <stdio.h>
-#include <stdint.h>
+/******************************************************************/
+// OC_XT_TEST_DUMMY_CRT.C
+// dummy implementation of CRT
+/******************************************************************/
+#include "oc_crt_int.h"
 
 
-#define ss_assert assert
+void oc_crt_init_rw_lock(Oc_crt_rw_lock * lock)
+{
+}
 
-#if OC_DEBUG
-#define ss_debugassert(cond) assert(cond)
-#else
-#define ss_debugassert(cond)
-#endif
+void oc_crt_lock_read(Oc_crt_rw_lock * lock)
+{
+}
 
-#define WRN(msg) { printf("\n"); printf msg; printf("\n"); fflush(stdout); }
-#define ERR(msg) { printf("\n"); printf msg; printf("\n"); fflush(stdout); ss_assert(0);}
+void oc_crt_lock_write(Oc_crt_rw_lock * lock)
+{
+}
 
-// Constants
-#define KB (1024)
-#define MB (KB*KB)
-#define GB (MB*KB)
+void oc_crt_unlock(Oc_crt_rw_lock * lock)
+{
+}
 
-#define SS_PAGE_SIZE        4096
-#define SS_SECTOR_SIZE      512
-#define SS_SECTORS_PER_PAGE 8
+void oc_crt_init_full(Oc_crt_config * config_p)
+{
+}
 
-#ifndef TRUE
-#define TRUE 1
-#endif
+void oc_crt_default_config(Oc_crt_config *config_p)
+{
+}
 
-#ifndef FALSE
-#define FALSE 0
-#endif
+void oc_crt_init(void)
+{
+}
 
-#ifndef offsetof
-#define offsetof(TYPE,MEMBER) ((uint32) &((TYPE *)0)->MEMBER)
-#endif
+void oc_crt_yield_task(void)
+{
+}
 
-#ifndef NULL
-#if defined(__cplusplus)
-#define NULL 0
-#else
-#define NULL ((void *)0)
-#endif
-#endif
+void oc_crt_assert(void)
+{
+}
 
-// Types
-typedef unsigned char      uchar;
-typedef signed   char      int8;
-typedef unsigned char      uint8; 
-typedef signed   short     int16;
-typedef unsigned short     uint16;   
-typedef signed   long      int32;
-typedef unsigned long      uint32;   
-/*  This atrib must be left off until we resolve alignment issues   */
-typedef signed long long   int64;   /* __attribute__((aligned(8))); */
-typedef unsigned long long uint64;  /* __attribute__((aligned(8))); */
-
-#ifndef __cplusplus
-typedef int32              bool;
-#endif
-
-typedef uint8              bool8;
-
-#endif
-
+int oc_crt_get_thread(void)
+{
+    return 1;
+}
 
 

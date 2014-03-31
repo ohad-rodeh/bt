@@ -29,76 +29,44 @@
  * 
  */
 /**************************************************************/
-/* PL_BASE.H
+/**********************************************************************/
+/* OC_XT_TEST_FS.H
+ *
+ * A free-space implementation that helps tests the correct functions
+ * of the x-tree.
  */
+/**********************************************************************/
+#ifndef OC_XT_TEST_FS_H
+#define OC_XT_TEST_FS_H
 
-#ifndef PL_BASE_H
-#define PL_BASE_H
+#include "pl_base.h"
 
-#include <assert.h>
-#include <stdio.h>
-#include <stdint.h>
+struct Oc_xt_test_fs_ctx;
 
+// create an FS instance
+struct Oc_xt_test_fs_ctx *oc_xt_test_fs_create(
+    char *str_desc_p,
+    bool verbose);
 
-#define ss_assert assert
+// delete an FS instance
+//void oc_xt_test_fs_reset(struct Oc_xt_test_fs_ctx *ctx_p);
 
-#if OC_DEBUG
-#define ss_debugassert(cond) assert(cond)
-#else
-#define ss_debugassert(cond)
-#endif
+/* allocate an extent of [len] units in free-space [ctx_p].
+ * return the initial offset of the allocated extent.
+ */
+uint32 oc_xt_test_fs_alloc(struct Oc_xt_test_fs_ctx *ctx_p,
+                           uint32 len);
+    
+// deallocate an extent of [len] units in free-space [ctx_p]
+void oc_xt_test_fs_dealloc(struct Oc_xt_test_fs_ctx *ctx_p,
+                           uint32 ofs,
+                           uint32 len);
 
-#define WRN(msg) { printf("\n"); printf msg; printf("\n"); fflush(stdout); }
-#define ERR(msg) { printf("\n"); printf msg; printf("\n"); fflush(stdout); ss_assert(0);}
-
-// Constants
-#define KB (1024)
-#define MB (KB*KB)
-#define GB (MB*KB)
-
-#define SS_PAGE_SIZE        4096
-#define SS_SECTOR_SIZE      512
-#define SS_SECTORS_PER_PAGE 8
-
-#ifndef TRUE
-#define TRUE 1
-#endif
-
-#ifndef FALSE
-#define FALSE 0
-#endif
-
-#ifndef offsetof
-#define offsetof(TYPE,MEMBER) ((uint32) &((TYPE *)0)->MEMBER)
-#endif
-
-#ifndef NULL
-#if defined(__cplusplus)
-#define NULL 0
-#else
-#define NULL ((void *)0)
-#endif
-#endif
-
-// Types
-typedef unsigned char      uchar;
-typedef signed   char      int8;
-typedef unsigned char      uint8; 
-typedef signed   short     int16;
-typedef unsigned short     uint16;   
-typedef signed   long      int32;
-typedef unsigned long      uint32;   
-/*  This atrib must be left off until we resolve alignment issues   */
-typedef signed long long   int64;   /* __attribute__((aligned(8))); */
-typedef unsigned long long uint64;  /* __attribute__((aligned(8))); */
-
-#ifndef __cplusplus
-typedef int32              bool;
-#endif
-
-typedef uint8              bool8;
+/* compare two free-space instances. Return TRUE if they are equal, FALSE
+ * otherwise.
+ */
+bool oc_xt_test_fs_compare(struct Oc_xt_test_fs_ctx *ctx1_p,
+                           struct Oc_xt_test_fs_ctx *ctx2_p);
 
 #endif
-
-
-
+/**********************************************************************/

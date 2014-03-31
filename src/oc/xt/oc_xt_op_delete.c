@@ -29,76 +29,51 @@
  * 
  */
 /**************************************************************/
-/* PL_BASE.H
+/**********************************************************************/
+/* OC_XT_OP_DELETE.C  
+ *
+ * delete a b+-tree
  */
+/**********************************************************************/
+/* Recursive decent through the tree. Remove the leaves and perform
+ * the user-defined "data_release" function for all data. Deallocate all
+ * internal nodes. 
+ */
+/**********************************************************************/
+#include "oc_xt_int.h"
+#include "oc_xt_trace.h"
+#include "oc_xt_nd.h"
+/**********************************************************************/
+static void delete_b(
+    struct Oc_wu *wu_p,
+    struct Oc_xt_state *s_p,
+    Oc_xt_node *node_p)
+{
+    if (!oc_xt_nd_is_leaf(s_p, node_p)) {
+        // An index node, recurse through its children
+        int i;
+        int num_entries = oc_xt_nd_num_entries(s_p, node_p);
+        Oc_xt_node *child_node_p;
+        struct Oc_xt_key *dummy_key_p;
+        uint64 child_addr;
+        
+        for (i=0; i< num_entries; i++) {
+            oc_xt_nd_index_get_kth(s_p, node_p, i,
+                                    &dummy_key_p,
+                                    &child_addr);
+            child_node_p = s_p->cfg_p->node_get(wu_p, child_addr);
+            delete_b(wu_p, s_p, child_node_p);
+        }
+    }
 
-#ifndef PL_BASE_H
-#define PL_BASE_H
-
-#include <assert.h>
-#include <stdio.h>
-#include <stdint.h>
-
-
-#define ss_assert assert
-
-#if OC_DEBUG
-#define ss_debugassert(cond) assert(cond)
-#else
-#define ss_debugassert(cond)
-#endif
-
-#define WRN(msg) { printf("\n"); printf msg; printf("\n"); fflush(stdout); }
-#define ERR(msg) { printf("\n"); printf msg; printf("\n"); fflush(stdout); ss_assert(0);}
-
-// Constants
-#define KB (1024)
-#define MB (KB*KB)
-#define GB (MB*KB)
-
-#define SS_PAGE_SIZE        4096
-#define SS_SECTOR_SIZE      512
-#define SS_SECTORS_PER_PAGE 8
-
-#ifndef TRUE
-#define TRUE 1
-#endif
-
-#ifndef FALSE
-#define FALSE 0
-#endif
-
-#ifndef offsetof
-#define offsetof(TYPE,MEMBER) ((uint32) &((TYPE *)0)->MEMBER)
-#endif
-
-#ifndef NULL
-#if defined(__cplusplus)
-#define NULL 0
-#else
-#define NULL ((void *)0)
-#endif
-#endif
-
-// Types
-typedef unsigned char      uchar;
-typedef signed   char      int8;
-typedef unsigned char      uint8; 
-typedef signed   short     int16;
-typedef unsigned short     uint16;   
-typedef signed   long      int32;
-typedef unsigned long      uint32;   
-/*  This atrib must be left off until we resolve alignment issues   */
-typedef signed long long   int64;   /* __attribute__((aligned(8))); */
-typedef unsigned long long uint64;  /* __attribute__((aligned(8))); */
-
-#ifndef __cplusplus
-typedef int32              bool;
-#endif
-
-typedef uint8              bool8;
-
-#endif
-
-
-
+    // remove this node
+    oc_xt_nd_delete(wu_p, s_p, node_p);
+}
+ 
+void oc_xt_op_delete_b(
+    struct Oc_wu *wu_p,
+    struct Oc_xt_state *s_p)
+{
+    delete_b(wu_p, s_p, s_p->root_node_p);
+    s_p->root_node_p = NULL;
+}

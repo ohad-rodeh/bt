@@ -44,7 +44,7 @@ OC=${OSDROOT}/src/oc
 OC_INCLUDE += \
 	-I $(OSDROOT)/src/pl
 
-OC_SUBDIRS = crt ds utl bpt  
+OC_SUBDIRS = crt ds utl bpt xt
 
 OC_INCLUDE += $(OC_SUBDIRS:%=-I $(OC)/%)
 
@@ -55,6 +55,9 @@ $(OBJDIR)/%.o: ${OC}/utl/%.c
 	$(CC) -c $(CFLAGS) $(OC_INCLUDE) $< -o $@
 
 $(OBJDIR)/%.o: ${OC}/bpt/%.c
+	$(CC) -c $(CFLAGS) $(OC_INCLUDE) $< -o $@
+
+$(OBJDIR)/%.o: ${OC}/xt/%.c
 	$(CC) -c $(CFLAGS) $(OC_INCLUDE) $< -o $@
 
 $(OBJDIR)/%.o: ${OC}/%.c

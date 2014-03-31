@@ -28,12 +28,16 @@
 # either expressed or implied, of IBM Research.
 #
 #*************************************************************#
-# -*- Mode: makefile -*-
-#*************************************************************#
-include ${OCROOT}/crt/files.mk
-include ${OCROOT}/utl/files.mk
-include ${OCROOT}/bpt/files.mk
-include ${OCROOT}/xt/files.mk
-
-#*************************************************************#
+XT_OBJECTS = \
+	${OBJDIR}/oc_xt.o \
+	${OBJDIR}/oc_xt_nd.o \
+	${OBJDIR}/oc_xt_utl.o \
+	${OBJDIR}/oc_xt_op_validate.o \
+	${OBJDIR}/oc_xt_op_stat.o \
+	${OBJDIR}/oc_xt_op_delete.o \
+	${OBJDIR}/oc_xt_op_output_dot.o \
+	${OBJDIR}/oc_xt_op_lookup_range.o \
+	${OBJDIR}/oc_xt_op_insert_range.o \
+	${OBJDIR}/oc_xt_op_remove_range.o \
+	${OBJDIR}/oc_xt_trace.o
 

@@ -30,10 +30,72 @@
 #*************************************************************#
 # -*- Mode: makefile -*-
 #*************************************************************#
-include ${OCROOT}/crt/files.mk
-include ${OCROOT}/utl/files.mk
-include ${OCROOT}/bpt/files.mk
-include ${OCROOT}/xt/files.mk
+#
+# Makefile for X-Tree Test module
+#
+#*************************************************************#
+OSDROOT=../../../..
+OCROOT=../..
+
+include $(OSDROOT)/src/mk/defs.mk
+include $(OSDROOT)/src/mk/rules.mk
+
+include $(OC)/crt/files.mk
+include $(OC)/utl/files.mk
+include $(OC)/xt/files.mk
 
 #*************************************************************#
 
+CFLAGS += \
+	-I $(OSDROOT)/src/pl
+
+SUBDIRS =  crt ds utl xt 
+
+CFLAGS += $(SUBDIRS:%=-I $(OCROOT)/%)
+
+#*************************************************************#
+
+OBJ = \
+	${OBJDIR}/oc_utl_trk.o \
+	${OBJDIR}/oc_utl_trace.o \
+	${OBJDIR}/oc_utl_trace_base.o \
+	${OBJDIR}/oc_xt_test_nd.o \
+	${OBJDIR}/oc_utl_htbl.o \
+	${OBJDIR}/oc_xt_test_utl.o \
+	${OBJDIR}/oc_xt_test_fs.o \
+	${OBJDIR}/oc_xt_alt.o  \
+	${XT_OBJECTS}
+
+all : $(BINDIR)/oc_xt_test_st 
+
+$(BINDIR)/oc_xt_test_st : \
+		${OBJ} \
+		${OBJDIR}/oc_xt_test_st.o \
+		${OBJDIR}/oc_xt_test_dummy_crt.o 
+	$(GENEXE) -o $(BINDIR)/oc_xt_test_st \
+	      ${OBJDIR}/oc_xt_test_st.o \
+	      $(OBJ) \
+	      ${OBJDIR}/oc_xt_test_dummy_crt.o \
+	   -L$(OSDROOT)/lib -lpl
+
+jpg :
+	dot -Tjpg X.dot -o X.jpg
+
+clean : 
+	$(RM) ${OBJDIR}/oc_xt_*.o
+	$(RM) ${BINDIR}/oc_xt_*
+	$(RM) *.o
+
+realclean : clean 
+
+xt_test: all
+
+#*************************************************************#
+
+ifeq ($(DEPEND), $(wildcard $(DEPEND)))
+  include $(DEPEND)
+else
+  $(error "Must create a top-level .depend file, then, do a make depend")
+endif
+
+#*************************************************************#

@@ -38,6 +38,8 @@
 typedef struct Oc_rm_resource {
     uint32 pm_pages;    // Maximum number of in-memory pages 
     uint32 fs_pages;    // Maximum number of on-disk pages
+    uint32 pm_write_pages_i;
+    uint32 pm_read_pages_i;
 } Oc_rm_resource;
 
 typedef struct Oc_rm_ticket {

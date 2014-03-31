@@ -29,76 +29,62 @@
  * 
  */
 /**************************************************************/
-/* PL_BASE.H
- */
+/******************************************************************/
+// OC_XT_ALT.H
+// An alternate implementation of a b-tree. Uses a linked-list.
+/******************************************************************/
+#ifndef OC_XT_ALT_H
+#define OC_XT_ALT_H
 
-#ifndef PL_BASE_H
-#define PL_BASE_H
+#include "oc_xt_int.h"
+#include "pl_base.h"
 
-#include <assert.h>
-#include <stdio.h>
-#include <stdint.h>
+struct Oc_wu;
 
+// A sorted list of records
+typedef struct Oc_xt_alt_state {
+    Ss_dlist list;
+    Oc_xt_cfg *cfg_p;
+} Oc_xt_alt_state;
 
-#define ss_assert assert
+void oc_xt_alt_init_state_b(
+    struct Oc_wu *wu_pi,
+    struct Oc_xt_alt_state *state_p,
+    Oc_xt_cfg *cfg_p);
 
-#if OC_DEBUG
-#define ss_debugassert(cond) assert(cond)
-#else
-#define ss_debugassert(cond)
-#endif
+void oc_xt_alt_create_b(
+    struct Oc_wu *wu_p,
+    struct Oc_xt_alt_state *s_p);
 
-#define WRN(msg) { printf("\n"); printf msg; printf("\n"); fflush(stdout); }
-#define ERR(msg) { printf("\n"); printf msg; printf("\n"); fflush(stdout); ss_assert(0);}
+void oc_xt_alt_delete_b(
+    struct Oc_wu *wu_p,
+    struct Oc_xt_alt_state *s_p);
 
-// Constants
-#define KB (1024)
-#define MB (KB*KB)
-#define GB (MB*KB)
+bool oc_xt_alt_dbg_validate_b(struct Oc_wu *wu_p,
+                              Oc_xt_alt_state *s_p);
+void oc_xt_alt_dbg_output_b(struct Oc_wu *wu_p,
+                            Oc_xt_alt_state *s_p);
 
-#define SS_PAGE_SIZE        4096
-#define SS_SECTOR_SIZE      512
-#define SS_SECTORS_PER_PAGE 8
+void oc_xt_alt_lookup_range_b(
+    struct Oc_wu *wu_p,
+    Oc_xt_alt_state *s_p,
+    struct Oc_xt_key *min_key_p,
+    struct Oc_xt_key *max_key_p,
+    int max_num_keys_i,
+    struct Oc_xt_key *key_array_po,
+    struct Oc_xt_rcrd *rcrd_array_po,
+    int *n_found_po);
 
-#ifndef TRUE
-#define TRUE 1
-#endif
+uint64 oc_xt_alt_insert_b(
+    struct Oc_wu *wu_p,
+    Oc_xt_alt_state *s_p,
+    struct Oc_xt_key *key_p,
+    struct Oc_xt_rcrd *rcrd_p);
 
-#ifndef FALSE
-#define FALSE 0
-#endif
-
-#ifndef offsetof
-#define offsetof(TYPE,MEMBER) ((uint32) &((TYPE *)0)->MEMBER)
-#endif
-
-#ifndef NULL
-#if defined(__cplusplus)
-#define NULL 0
-#else
-#define NULL ((void *)0)
-#endif
-#endif
-
-// Types
-typedef unsigned char      uchar;
-typedef signed   char      int8;
-typedef unsigned char      uint8; 
-typedef signed   short     int16;
-typedef unsigned short     uint16;   
-typedef signed   long      int32;
-typedef unsigned long      uint32;   
-/*  This atrib must be left off until we resolve alignment issues   */
-typedef signed long long   int64;   /* __attribute__((aligned(8))); */
-typedef unsigned long long uint64;  /* __attribute__((aligned(8))); */
-
-#ifndef __cplusplus
-typedef int32              bool;
-#endif
-
-typedef uint8              bool8;
+uint64 oc_xt_alt_remove_range_b(
+    struct Oc_wu *wu_p,
+    Oc_xt_alt_state *s_p,
+    struct Oc_xt_key *min_key_p,
+    struct Oc_xt_key *max_key_p);
 
 #endif
-
-
-

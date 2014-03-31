@@ -28,12 +28,8 @@
 # either expressed or implied, of IBM Research.
 #
 #*************************************************************#
-# -*- Mode: makefile -*-
-#*************************************************************#
-include ${OCROOT}/crt/files.mk
-include ${OCROOT}/utl/files.mk
-include ${OCROOT}/bpt/files.mk
-include ${OCROOT}/xt/files.mk
+Stricter testing
 
-#*************************************************************#
+1. Test correct release of data. 
 
+2. Test correct queries. 

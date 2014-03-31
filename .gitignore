@@ -3,3 +3,4 @@ lib
 obj
 src/.depend
 *~
+cscope*

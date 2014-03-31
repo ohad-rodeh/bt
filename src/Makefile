@@ -53,7 +53,8 @@ include $(OSDROOT)/src/oc/files_all.mk
 
 all : pre_reqs \
       $(LIBDIR)/libpl.a \
-      bpt_test
+      bpt_test \
+      xt_test
 
 everything : all tests
 
@@ -63,15 +64,19 @@ pre_reqs :
 bpt_test : 
 	cd $(OCROOT)/bpt/test; make all
 
+xt_test : 
+	cd $(OCROOT)/xt/test; make all
+
 #*************************************************************#
 # Build all tests. 
 #
 # Add new test directires here. 
 
 TEST_SUBDIRS = 	\
-    $(OCROOT)/crt/test    \
-    $(OCROOT)/utl/test    \
-    $(OCROOT)/bpt/test 	 
+    $(OCROOT)/crt/test  \
+    $(OCROOT)/utl/test  \
+    $(OCROOT)/bpt/test	\
+    $(OCROOT)/xt/test 	 
 
 
 MAKE_SUBDIRS = for d in $(TEST_SUBDIRS); do ($(MAKE) -C $$d ); done
@@ -99,7 +104,9 @@ DEPEND_CFLAGS = $(CFLAGS)
 DEPEND_CFLAGS += $(OC_INCLUDE)
 
 DEPEND_CFLAGS += \
-	-I $(OSDROOT)/src/pl
+	-I $(OSDROOT)/src/pl \
+	-I $(OSDROOT)/src/oc/bpt \
+	-I $(OSDROOT)/src/oc/xt
 
 depend: pre_reqs 
 	- gcc $(DEPEND_CFLAGS) -MM $(SRC_FILES) > .depend

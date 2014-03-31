@@ -30,10 +30,16 @@
 #*************************************************************#
 # -*- Mode: makefile -*-
 #*************************************************************#
-include ${OCROOT}/crt/files.mk
-include ${OCROOT}/utl/files.mk
-include ${OCROOT}/bpt/files.mk
-include ${OCROOT}/xt/files.mk
-
+#
+# Makefile for BPT
+#
 #*************************************************************#
+OSDROOT=../../..
+
+include $(OSDROOT)/src/mk/defs.mk
+include $(OSDROOT)/src/mk/sub.mk
+include $(OSDROOT)/src/mk/rules.mk
+#*************************************************************#
+
+
 

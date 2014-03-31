@@ -29,76 +29,51 @@
  * 
  */
 /**************************************************************/
-/* PL_BASE.H
+/**********************************************************************/
+/* OC_XT_UTL.H
+ *
+ * Some utilities. 
  */
+/**********************************************************************/
+#ifndef OC_XT_UTL_H
+#define OC_XT_UTL_H
 
-#ifndef PL_BASE_H
-#define PL_BASE_H
+#include "pl_base.h"
+#include "oc_xt_int.h"
 
-#include <assert.h>
-#include <stdio.h>
-#include <stdint.h>
+// Check if a node is fully covered by the range [min_key_p] .. [max_key_p]
+bool oc_xt_utl_covered(
+    struct Oc_wu *wu_p,
+    struct Oc_xt_state *s_p,
+    Oc_xt_node *node_p,
+    struct Oc_xt_key* min_key_p,
+    struct Oc_xt_key* max_key_p);
 
+/* Delete a sub-tree rooted at [node_p].
+ *
+ * assumptions:
+ *  - [node_p] is unlocked
+ *  - The whole tree is locked
+ *
+ * [node_p] is released after the operation.
+ */
+void oc_xt_utl_delete_subtree_b(
+    struct Oc_wu *wu_p,
+    struct Oc_xt_state *s_p,
+    Oc_xt_node *node_p);
 
-#define ss_assert assert
-
-#if OC_DEBUG
-#define ss_debugassert(cond) assert(cond)
-#else
-#define ss_debugassert(cond)
-#endif
-
-#define WRN(msg) { printf("\n"); printf msg; printf("\n"); fflush(stdout); }
-#define ERR(msg) { printf("\n"); printf msg; printf("\n"); fflush(stdout); ss_assert(0);}
-
-// Constants
-#define KB (1024)
-#define MB (KB*KB)
-#define GB (MB*KB)
-
-#define SS_PAGE_SIZE        4096
-#define SS_SECTOR_SIZE      512
-#define SS_SECTORS_PER_PAGE 8
-
-#ifndef TRUE
-#define TRUE 1
-#endif
-
-#ifndef FALSE
-#define FALSE 0
-#endif
-
-#ifndef offsetof
-#define offsetof(TYPE,MEMBER) ((uint32) &((TYPE *)0)->MEMBER)
-#endif
-
-#ifndef NULL
-#if defined(__cplusplus)
-#define NULL 0
-#else
-#define NULL ((void *)0)
-#endif
-#endif
-
-// Types
-typedef unsigned char      uchar;
-typedef signed   char      int8;
-typedef unsigned char      uint8; 
-typedef signed   short     int16;
-typedef unsigned short     uint16;   
-typedef signed   long      int32;
-typedef unsigned long      uint32;   
-/*  This atrib must be left off until we resolve alignment issues   */
-typedef signed long long   int64;   /* __attribute__((aligned(8))); */
-typedef unsigned long long uint64;  /* __attribute__((aligned(8))); */
-
-#ifndef __cplusplus
-typedef int32              bool;
-#endif
-
-typedef uint8              bool8;
+/* Delete all the key-value pairs in the tree. 
+ * Leave the root node empty but do not delete it.
+ * 
+ * assumptions:
+ *  - The whole tree is locked
+ *  - The ref-count of [node_p] greater than one and
+ *    it can be modified. 
+ *
+ * The root is modified, it's ref-count remains the same. 
+ */
+void oc_xt_utl_delete_all_b(
+    struct Oc_wu *wu_p,
+    struct Oc_xt_state *s_p);
 
 #endif
-
-
-
