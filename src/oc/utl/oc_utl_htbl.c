@@ -55,7 +55,7 @@ void oc_utl_htbl_create(
 {
     memset(htbl, 0, sizeof(Oc_utl_htbl));
     if (NULL == slot_array_pi) {
-        htbl->arr = (Ss_slist_node**) pl_mm_malloc(size * sizeof(int));
+        htbl->arr = (Ss_slist_node**) pl_mm_malloc(size * sizeof(int*));
         if (htbl->arr) {
             htbl->arr_malloced_on_create = TRUE;
         }
@@ -63,7 +63,7 @@ void oc_utl_htbl_create(
     else
         htbl->arr = (Ss_slist_node**) slot_array_pi;
 
-    memset(htbl->arr, 0, size * sizeof(int));
+    memset(htbl->arr, 0, size * sizeof(int*));
     htbl->len=size;
     htbl->size = 0;
     htbl->hash = hash;
@@ -301,15 +301,15 @@ void oc_utl_htbl_iter_mv_to_list(Oc_utl_htbl *h_i,
     uint32 i;
     Ss_slist_node *elem_p, *rmv_p;
     int cont;
-        
-    for (i=0; i<h_i->len; i++) {
+
+    for (i=0; i < h_i->len; i++) {
         elem_p = h_i->arr[i] ;
         if (NULL == elem_p) continue;
 
         // If the first element(s) should be removed -- remove them
         cont = TRUE;
         while ( cont
-                && elem_p ) {
+                && elem_p != NULL) {
             cont = FALSE;
 
             switch (fun(elem_p, additional_data)) {

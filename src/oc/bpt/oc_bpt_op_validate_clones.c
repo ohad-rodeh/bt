@@ -265,10 +265,11 @@ bool oc_bpt_op_validate_clones_b(
     }
 
     // printf("checking free-space counters\n"); fflush(stdout);
-    
+
     // now check the free-space counts
     oc_bpt_label_init(10000);
     rc = check_fs_b(wu_p, n_clones, st_array);
+
     oc_bpt_label_free();
 
     return rc;
