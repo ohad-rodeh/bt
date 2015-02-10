@@ -24,3 +24,7 @@ The src directory contains these sub-directories:
     oc/utl  utilities
     oc/xt   extent tree
     pl      platform
+
+Questions
+=========
+Please send questions to my e-mail: ohad.rodeh@gmail.com.
