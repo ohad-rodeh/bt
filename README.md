@@ -19,12 +19,15 @@ The src directory contains these sub-directories:
 
     oc      object code
     oc/bpt  b-tree
-    oc/crt  co-routines
+    oc/crt  thread and lock support, based on pthreads
     oc/ds   data structures
     oc/utl  utilities
     oc/xt   extent tree
     pl      platform
 
+The locking and thread support is currently based on Linux
+pthreads. The name "crt" is due to an
+internal co-routine library that was used prior to this, and never released.
 
 B-tree implementation
 =====================
