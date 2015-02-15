@@ -40,7 +40,6 @@
 
 #include "oc_utl.h"
 #include "oc_crt_int.h"
-#include "oc_utl_page.h"
 
 /******************************************************************/
 
@@ -120,20 +119,16 @@ void oc_utl_init_full(Oc_utl_config *conf_pi)
     printf("   lun size: %Lu(Mbyte), or, %Lu(Kbyte)\n",
            oc_utl_conf_g.lun_size /(1024 * 1024),
            oc_utl_conf_g.lun_size / 1024);
-    printf("   num_pages: %d\n", oc_utl_conf_g.num_pages);
     printf("   OSD version: %lu\n", (uint32)oc_utl_conf_g.version);    
     printf("   data dev: %s\n", oc_utl_conf_g.data_dev);    
     printf("   ljl dev: %s\n", oc_utl_conf_g.ljl_dev);    
     printf("====================\n");
-
-    oc_utl_page_init(conf_pi->num_pages);
 }
 
 void oc_utl_default_config(Oc_utl_config *conf_po)
 {
     memset(conf_po, 0, sizeof(Oc_utl_config));
     conf_po->lun_size = OC_LUN_SIZE;
-    conf_po->num_pages = OC_NUM_PAGES;
         
     memset(conf_po->data_dev, 0, 60);
     memset(conf_po->ljl_dev, 0, 60);
@@ -149,7 +144,7 @@ void oc_utl_init(void)
 
 void oc_utl_free_resources()
 {
-    oc_utl_page_free_resources();
+    //oc_utl_page_free_resources();
 }
 
 /**************************************************************/

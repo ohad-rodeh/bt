@@ -40,6 +40,7 @@
 
 #include "pl_base.h"
 #include "oc_rm_s.h"
+#include "oc_wu_s.h"
 
 // configuration defined on the command line
 extern int num_rounds;

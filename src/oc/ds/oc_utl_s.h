@@ -67,9 +67,9 @@ typedef struct Oc_meta_data_page_hndl {
 
 typedef struct Oc_utl_config {
     uint64 lun_size;                // LUN size in bytes
-    int    num_pages;               // The number of pages
+    //    int    num_pages;               // The number of pages
     uint16 version;                 // Version number of ObjectStone
-    int    max_num_pages_in_io;     // Maximum number of pages in a single IO
+    //    int    max_num_pages_in_io;     // Maximum number of pages in a single IO
     char   data_dev[60];            // Device name to store data
     char   ljl_dev[60];             // Device name to store journal
 
@@ -88,41 +88,5 @@ typedef struct Oc_utl_trk_ref_set {
 typedef struct Oc_utl_rm {
     Oc_utl_trk_ref_set refs;
 } Oc_utl_rm;
-
-typedef enum Oc_utl_page_state {
-    OC_UTL_PAGE_NORMAL,
-    OC_UTL_PAGE_IN_READ,
-    OC_UTL_PAGE_IN_WRITE,
-} Oc_utl_page_state;
-
-typedef struct Oc_utl_phys_pos {
-    uint64 addr_i;            // disk-address (in bytes)
-} Oc_utl_phys_pos;
-
-typedef struct Oc_utl_page {
-    Ss_slist_node link;          // Used in the htbl, has to be the first field
-    Ss_dlist_node lru_link;      // Used in the free list
-    Ss_dlist_node adjacent;      // links to adjacent pages
-
-    Oc_utl_phys_pos pos;
-    
-    Oc_utl_page_state state;
-
-    struct {
-        unsigned        dirty:1;     // The page contains dirty data
-        unsigned        meta_data:1; // A meta-data page.
-        unsigned        cached:1;    // A page that is in-cache
-        unsigned        invalid:1;   // This page is in the free-pool (invalid)
-        unsigned        to_free:1;   // Free this page after writing to disk
-    } flags;
-
-    Oc_crt_wait_q wait_q;
-    int ref_count;      
-    struct Pl_utl_iobuf *iobuf_p;       // A page-sized (4096 bytes) buffer
-    char *buf_p;                        // A usable pointer into [iobuf_p] 
-
-    void *ctx_p;                        // used for performing IO
-} Oc_utl_page;
-
 
 #endif

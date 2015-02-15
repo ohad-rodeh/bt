@@ -56,6 +56,7 @@ CFLAGS += $(SUBDIRS:%=-I $(OCROOT)/%)
 #*************************************************************#
 
 OBJ = \
+	${CRT_OBJECTS} \
 	${OBJDIR}/oc_utl_trk.o \
 	${OBJDIR}/oc_utl_trace.o \
 	${OBJDIR}/oc_utl_trace_base.o \
@@ -70,13 +71,11 @@ all : $(BINDIR)/oc_xt_test_st
 
 $(BINDIR)/oc_xt_test_st : \
 		${OBJ} \
-		${OBJDIR}/oc_xt_test_st.o \
-		${OBJDIR}/oc_xt_test_dummy_crt.o 
+		${OBJDIR}/oc_xt_test_st.o
 	$(GENEXE) -o $(BINDIR)/oc_xt_test_st \
 	      ${OBJDIR}/oc_xt_test_st.o \
 	      $(OBJ) \
-	      ${OBJDIR}/oc_xt_test_dummy_crt.o \
-	   -L$(OSDROOT)/lib -lpl
+	   -L$(OSDROOT)/lib -lpl -lpthread
 
 jpg :
 	dot -Tjpg X.dot -o X.jpg

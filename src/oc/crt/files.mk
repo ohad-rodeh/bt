@@ -28,12 +28,7 @@
 # either expressed or implied, of IBM Research.
 #
 #*************************************************************#
-CRT_CORE_OBJECTS = \
-	${OBJDIR}/oc_crt_time.o \
-	${OBJDIR}/oc_crt.o \
-	${OBJDIR}/oc_crt_trace.o
+CRT_OBJECTS = \
+	${OBJDIR}/oc_crt.o
 
-CRT_MALLOC_OBJECTS = \
-	${CRT_CORE_OBJECTS} \
-	${OBJDIR}/oc_crt_mem_malloc.o
 

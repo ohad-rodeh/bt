@@ -40,6 +40,7 @@
 
 #include "pl_base.h"
 #include "oc_rm_s.h"
+#include "oc_wu_s.h"
 
 // configuration defined on the command line
 extern int num_rounds;
@@ -61,8 +62,6 @@ typedef enum Oc_xt_test_utl_type {
 } Oc_xt_test_utl_type;
 
 extern Oc_xt_test_utl_type test_type;
-
-struct Oc_wu;
 
 // setup
 void oc_xt_test_utl_init_module(void);

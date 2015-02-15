@@ -33,8 +33,7 @@ UTL_OBJECTS = \
 	${OBJDIR}/oc_utl.o 		\
 	${OBJDIR}/oc_utl_trace_base.o 	\
 	${OBJDIR}/oc_utl_trace.o 	\
-	${OBJDIR}/oc_utl_trk.o 		\
-	${OBJDIR}/oc_utl_page.o
+	${OBJDIR}/oc_utl_trk.o 		
 
 UTL_SHIM_OBJECTS = ${UTL_OBJECTS}
 

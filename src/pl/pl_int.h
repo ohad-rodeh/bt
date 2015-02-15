@@ -42,6 +42,7 @@ end_copyright_notice_OCO_2005
 #define PL_INT_H
 
 #include "pl_mm_int.h"
+#include "pl_dstru.h"
 
 uint32 pl_rand_uint32(uint32 num);
 

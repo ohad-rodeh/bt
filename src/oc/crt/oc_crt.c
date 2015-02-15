@@ -38,6 +38,9 @@
 #include <pthread.h>
 #include <semaphore.h>
 #include <sched.h>
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
 
 static Oc_crt_config config;
 /******************************************************************/
@@ -49,8 +52,10 @@ void oc_crt_init_rw_lock(Oc_crt_rw_lock * lock)
     int ern;
     pthread_rwlock_t *rw_p = (pthread_rwlock_t*) lock;
 
-    if (ern = pthread_rwlock_init(rw_p, NULL))
-        ERR(("pthread_rwlock_init: (%d) %s", ern, strerror(ern))) ;
+    if (ern = pthread_rwlock_init(rw_p, NULL)) {
+        printf("pthread_rwlock_init: (%d) %s", ern, strerror(ern)) ;
+        exit(1);
+    }
 }
 
 void oc_crt_lock_read(Oc_crt_rw_lock * lock)
@@ -58,8 +63,10 @@ void oc_crt_lock_read(Oc_crt_rw_lock * lock)
     int ern;
     pthread_rwlock_t *rw_p = (pthread_rwlock_t*) lock;
 
-    if (ern = pthread_rwlock_rdlock (rw_p))
-        ERR(("pthread_rwlock_rdlock: (%d) %s", ern, strerror(ern))) ;
+    if (ern = pthread_rwlock_rdlock (rw_p)) {
+        printf("pthread_rwlock_rdlock: (%d) %s\n", ern, strerror(ern));
+        exit(1);
+    }
 }
 
 void oc_crt_lock_write(Oc_crt_rw_lock * lock)
@@ -67,8 +74,11 @@ void oc_crt_lock_write(Oc_crt_rw_lock * lock)
     int ern;
     pthread_rwlock_t *rw_p = (pthread_rwlock_t*) lock;
 
-    if (ern = pthread_rwlock_wrlock(rw_p))
-        ERR(("pthread_rwlock_wrlock: (%d) %s", ern, strerror(ern))) ;
+    if (ern = pthread_rwlock_wrlock(rw_p)) {
+        printf("pthread_rwlock_wrlock: (%d) %s", ern, strerror(ern)) ;
+        exit(1);
+    }
+
 }
 
 void oc_crt_unlock(Oc_crt_rw_lock * lock)
@@ -76,9 +86,27 @@ void oc_crt_unlock(Oc_crt_rw_lock * lock)
     int ern;
     pthread_rwlock_t *rw_p = (pthread_rwlock_t*) lock;
 
-    if (ern = pthread_rwlock_unlock(rw_p))
-        ERR(("pthread_rwlock_unlock: (%d) %s", ern, strerror(ern))) ;
+    if (ern = pthread_rwlock_unlock(rw_p)) {
+        printf("pthread_rwlock_unlock: (%d) %s", ern, strerror(ern)) ;
+        exit(1);
+    }
 }
+
+bool oc_crt_rw_is_locked_write(Oc_crt_rw_lock * lock)
+{
+    return TRUE;
+}
+
+bool oc_crt_rw_is_locked_read(Oc_crt_rw_lock * lock_p)
+{
+    return TRUE;
+}
+
+bool oc_crt_lock_check(Oc_crt_rw_lock * lock_p)
+{
+    return TRUE;
+}
+
 
 void oc_crt_init_full(Oc_crt_config * config_p)
 {
@@ -86,10 +114,10 @@ void oc_crt_init_full(Oc_crt_config * config_p)
     
     config = *config_p;
 
-    printf("sizeof(oc_crt_rwlock) = %d\n", sizeof(Oc_crt_rw_lock));
-    printf("sizeof(pthread_rwlock_t) = %d\n", sizeof(pthread_rwlock_t));
-    printf("sizeof(oc_crt_sema) = %d\n", sizeof(Oc_crt_sema));
-    printf("sizeof(sem_t) = %d\n", sizeof(sem_t));
+    printf("sizeof(oc_crt_rwlock) = %ld\n", sizeof(Oc_crt_rw_lock));
+    printf("sizeof(pthread_rwlock_t) = %ld\n", sizeof(pthread_rwlock_t));
+    printf("sizeof(oc_crt_sema) = %ld\n", sizeof(Oc_crt_sema));
+    printf("sizeof(sem_t) = %ld\n", sizeof(sem_t));
 
     oc_utl_assert(sizeof(Oc_crt_rw_lock) >= sizeof(pthread_rwlock_t));
     oc_utl_assert(sizeof(Oc_crt_sema) >= sizeof(sem_t));

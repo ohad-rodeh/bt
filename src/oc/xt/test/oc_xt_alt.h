@@ -38,7 +38,8 @@
 
 #include "oc_xt_int.h"
 #include "pl_base.h"
-
+#include "pl_dstru.h"
+ 
 struct Oc_wu;
 
 // A sorted list of records

@@ -56,6 +56,7 @@ CFLAGS += -I $(OSDROOT)/src/pl
 
 OBJ = \
 	${OBJDIR}/pl_trace.o \
+	${CRT_OBJECTS} \
 	${UTL_OBJECTS} \
 	${BPT_OBJECTS} \
 	${OBJDIR}/oc_bpt_test_fs.o \
@@ -68,22 +69,18 @@ all :  \
 
 
 $(BINDIR)/oc_bpt_test_st : ${OBJ} \
-			   ${OBJDIR}/oc_bpt_test_st.o \
-		           ${OBJDIR}/oc_bpt_test_dummy_crt.o
+			   ${OBJDIR}/oc_bpt_test_st.o 
 	$(GENEXE) -o $(BINDIR)/oc_bpt_test_st \
 	      ${OBJDIR}/oc_bpt_test_st.o \
-              ${OBJDIR}/oc_bpt_test_dummy_crt.o \
 	      $(OBJ) \
 	   -L$(OSDROOT)/lib -lpl -lpthread
 
 $(BINDIR)/oc_bpt_test_clone_st : ${OBJ} \
 			         ${OBJDIR}/oc_bpt_test_clone_st.o \
-			         ${OBJDIR}/oc_bpt_test_dummy_crt.o \
 			         ${OBJDIR}/oc_bpt_test_clone.o
 	$(GENEXE) -o $(BINDIR)/oc_bpt_test_clone_st \
 	      ${OBJDIR}/oc_bpt_test_clone_st.o \
               ${OBJDIR}/oc_bpt_test_clone.o \
-              ${OBJDIR}/oc_bpt_test_dummy_crt.o \
 	      $(OBJ) \
 	   -L$(OSDROOT)/lib -lpl -lpthread
 

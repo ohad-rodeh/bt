@@ -32,7 +32,6 @@
 #ifndef OC_RM_S_H
 #define OC_RM_S_H
 
-#include "oc_pm_s.h"
 #include "oc_utl_s.h"
 
 typedef struct Oc_rm_resource {
@@ -47,7 +46,7 @@ typedef struct Oc_rm_ticket {
     uint32   fs_ticket_o;
 
     Oc_utl_rm utl_rm;
-    Oc_pm_rm pm_rm;
+  //Oc_pm_rm pm_rm;
 } Oc_rm_ticket;
 
 #endif

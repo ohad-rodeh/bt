@@ -155,7 +155,7 @@ void oc_utl_trk_abort(Oc_wu *wu_p)
     for(i=0; i<refs_p->cursor; i++) {
 //        printf("MODE: %d", refs_p->locks[i]->mode);
         if (refs_p->locks[i] != NULL) {
-            oc_utl_assert (refs_p->locks[i]->mode != CRT_RWSTATE_NONE);
+            //oc_utl_assert (refs_p->locks[i]->mode != CRT_RWSTATE_NONE);
             oc_crt_unlock(refs_p->locks[i]);
             refs_p->locks[i] = NULL;
         }

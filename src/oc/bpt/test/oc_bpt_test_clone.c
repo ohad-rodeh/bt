@@ -38,6 +38,7 @@
 #include <string.h>
 
 #include "pl_mm_int.h"
+#include "oc_utl.h"
 #include "oc_bpt_test_utl.h"
 #include "oc_bpt_test_fs.h"
 #include "oc_bpt_int.h"

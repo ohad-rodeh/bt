@@ -255,7 +255,6 @@ static void node_dealloc(Oc_wu *wu_p, uint64 addr)
         tnode_p->magic = -1;
         data = tnode_p->node.data;
         tnode_p->node.data = NULL;
-        tnode_p->node.lock.counter = 100;
         tnode_p->node.disk_addr = 0;
         
         free(data);

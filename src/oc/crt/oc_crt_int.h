@@ -70,59 +70,15 @@ void oc_crt_create_task_b(const char * name_p,
                           void (*run_p) (void *),
                           void * arg_p);
 
-Oc_crt_task *oc_crt_get_current_task(void);
+//Oc_crt_task *oc_crt_get_current_task(void);
 
 // kills all tasks except current one
-void oc_crt_kill_all();
-
-void oc_crt_throw(void);
-
-#define OC_CRT_TRY \
-    { \
-        Oc_crt_task * current = oc_crt_get_current_task(); \
-        if(current == NULL) { \
-              ERR(("Cant do try not inside coroutine %p\n", current)); \
-        } \
-        if(current->exception_is_set == TRUE) { \
-              ERR(("Exception has already been set\n")); \
-        } \
-        current->exception_caught = 0; \
-        current->exception_is_set = TRUE; \
-        if(setjmp(current->exception) == 0) {
-             /* code inside the TRY */
-#define OC_CRT_CATCH \
-        } \
-        else {\
-             oc_utl_assert(current->exception_is_set == TRUE); \
-             current->exception_caught = 1; \
-        } \
-    } \
-    oc_crt_get_current_task()->exception_is_set = FALSE; \
-    if (oc_crt_get_current_task()->exception_caught)
-    /* code inside catch */
-
-#define OC_CRT_THROW oc_crt_throw()
-
-#define OC_CRT_THROW_DBG oc_utl_assert(0)
-
-void oc_crt_sleep(uint32 milisec);
-
-void oc_crt_yield_task(void);
-
-void oc_crt_init_wait_q(Oc_crt_wait_q * wq);
-void oc_crt_wait_on_q(Oc_crt_wait_q * wq);
-void oc_crt_wake_up_q(Oc_crt_wait_q * wq);
-void oc_crt_wake_up_all(Oc_crt_wait_q * wq);
-int  oc_crt_wait_q_len(Oc_crt_wait_q * wq);
-int  oc_crt_is_wait_q_empty(Oc_crt_wait_q * wq);
+//void oc_crt_kill_all();
 
 // RW locks
 void oc_crt_init_rw_lock(Oc_crt_rw_lock * lock);
 void oc_crt_lock_read(Oc_crt_rw_lock * lock);
 void oc_crt_lock_write(Oc_crt_rw_lock * lock);
-
-// downgrade from write-mode to read-mode
-void oc_crt_lock_downgrade(Oc_crt_rw_lock *lock_p);
 void oc_crt_unlock(Oc_crt_rw_lock * lock);
 
 // return TRUE if lock is taken for write, FALSE otherwise
@@ -135,32 +91,6 @@ void oc_crt_sema_init(Oc_crt_sema * sema_p, int value);
 void oc_crt_sema_post(Oc_crt_sema * sema_p);
 void oc_crt_sema_wait(Oc_crt_sema * sema_p);
 int  oc_crt_sema_get_val(Oc_crt_sema * sema_p);
-
-/* Binary semaphores (b-semaphore).
- * 
- * A binary semaphore can count only between 0 and 1.
- *
- * Posting to a b-semaphore increases its value to 1. Subsequent
- * post operations leave the value at 1. A wait operation reduces
- * the value to zero.
- */
-void oc_crt_bn_sema_init(Oc_crt_bn_sema * sema_p, int value);
-void oc_crt_bn_sema_post(Oc_crt_bn_sema * sema_p);
-void oc_crt_bn_sema_wait(Oc_crt_bn_sema * sema_p);
-int  oc_crt_bn_sema_get_val(Oc_crt_bn_sema * sema_p);
-
-// Atomic counters
-void oc_crt_atom_cnt_init(Oc_crt_atom_cnt * acnt_p, int init_num_i);
-void oc_crt_atom_cnt_inc(Oc_crt_atom_cnt * acnt_p, int num_i);
-void oc_crt_atom_cnt_dec(Oc_crt_atom_cnt * acnt_p, int num_i);
-int  oc_crt_atom_cnt_get_val(Oc_crt_atom_cnt * acnt_p);
-
-// Thread-safe semaphores
-void oc_crt_ts_sema_init(Oc_crt_ts_sema * sema_p, int value);
-void oc_crt_ts_sema_post(Oc_crt_ts_sema * sema_p);
-void oc_crt_ts_sema_wait(Oc_crt_ts_sema * sema_p);
-int  oc_crt_ts_sema_pending(Oc_crt_ts_sema * sema_p);
-int  oc_crt_ts_sema_get_val(Oc_crt_ts_sema * sema_p);
 
 #endif
 

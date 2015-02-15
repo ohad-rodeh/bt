@@ -25,10 +25,6 @@ The src directory contains these sub-directories:
     oc/xt   extent tree
     pl      platform
 
-Questions
-=========
-Please send questions to my e-mail: ohad.rodeh@gmail.com.
-
 
 B-tree implementation
 =====================
@@ -49,11 +45,14 @@ Directory oc/bpt holds the core b-tree code, the files are as follows:
     oc_bpt_op_validate.[ch] validate a btree, for debugging
     oc_bpt_op_validate_clones.[ch] validate a btree, for debugging
 
-The most complicated algorithm remove-range, the main issue is that removing a range from the middle of a tree causes significant difficulties when trying to rebalance it. The output-dot files are used to generate b-tree descriptions in dot format (http://www.graphviz.org/).
+The most complicated algorithm remove-range, the main issue is that removing a range from the middle of a tree causes significant difficulties when trying to rebalance it. The output-dot files are used to generate b-tree descriptions in dot format (http://www.graphviz.org/). This allows using the dot program to visualize test outputs, for example:
+	dot -Tjpg X.dot -o X.jpg
 
 The Oc_wu structure that is passed around by the code, describe a "work-unit". This is probably equivalent to a transaction in the caller code. 
 
 TODO
 ====
-Migrate to pthreads
+Revive the multi-threaded tests, so they will work correctly pthreads. 
+
+
 

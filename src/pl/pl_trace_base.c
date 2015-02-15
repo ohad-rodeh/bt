@@ -202,7 +202,7 @@ void pl_trace_base(Pl_trace_base_tag tag,
 	// make sure buf is large enough
 	assert(strlen(buf)<(sizeof(buf)-2));
 
-        printf(buf);
+        printf("%s", buf);
         fflush(stdout);
     }
 }
