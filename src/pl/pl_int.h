@@ -55,6 +55,8 @@ int pl_memtest(void* buf_p, uint8 byte_value, int length);
 
 void pl_init(void);
 
+void pl_utl_set_hns(void);
+
 char* pl_create_base_dir(void);
 
 char *pl_get_base_dir(void);

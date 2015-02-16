@@ -502,7 +502,7 @@ void oc_xt_query_b(
         r_p->pm_write_pages_i += 3;   
 
         // the number of disk-pages needed depends on the length of the extent
-        nkeys = ((int) param)/ SS_PAGE_SIZE;
+        nkeys = (*(int*)(void*) param)/ SS_PAGE_SIZE;
         num_iters = 1 + (nkeys / (cfg_p->max_num_ent_leaf_node/2));
         r_p->fs_pages += num_iters * OC_XT_MAX_HEIGHT;
         cfg_p->fs_query_alloc(r_p, 1);

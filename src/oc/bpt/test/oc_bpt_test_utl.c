@@ -41,6 +41,7 @@
 #include <alloca.h>
 
 #include "pl_trace_base.h"
+#include "pl_int.h"
 #include "oc_utl_htbl.h"
 #include "oc_utl_trk.h"
 #include "oc_bpt_int.h"
@@ -207,7 +208,7 @@ static Oc_bpt_node* node_alloc(Oc_wu *wu_p)
 
     if (wu_p->po_id != 0)
         if (oc_bpt_test_utl_random_number(2) == 0)
-            oc_crt_yield_task();
+        oc_crt_yield_task();
     
     tnode_p = (struct Oc_bpt_test_node*) wrap_malloc(sizeof(Oc_bpt_test_node));
     memset(tnode_p, 0, sizeof(Oc_bpt_test_node));

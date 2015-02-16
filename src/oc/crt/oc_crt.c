@@ -50,9 +50,9 @@ static Oc_crt_config config;
 void oc_crt_init_rw_lock(Oc_crt_rw_lock * lock)
 {
     int ern;
-    pthread_rwlock_t *rw_p = (pthread_rwlock_t*) lock;
 
-    if (ern = pthread_rwlock_init(rw_p, NULL)) {
+    ern = pthread_rwlock_init(&lock->lock, NULL);
+    if (ern) {
         printf("pthread_rwlock_init: (%d) %s", ern, strerror(ern)) ;
         exit(1);
     }
@@ -61,9 +61,9 @@ void oc_crt_init_rw_lock(Oc_crt_rw_lock * lock)
 void oc_crt_lock_read(Oc_crt_rw_lock * lock)
 {
     int ern;
-    pthread_rwlock_t *rw_p = (pthread_rwlock_t*) lock;
 
-    if (ern = pthread_rwlock_rdlock (rw_p)) {
+    ern = pthread_rwlock_rdlock(&lock->lock);
+    if (ern) {
         printf("pthread_rwlock_rdlock: (%d) %s\n", ern, strerror(ern));
         exit(1);
     }
@@ -72,21 +72,20 @@ void oc_crt_lock_read(Oc_crt_rw_lock * lock)
 void oc_crt_lock_write(Oc_crt_rw_lock * lock)
 {
     int ern;
-    pthread_rwlock_t *rw_p = (pthread_rwlock_t*) lock;
 
-    if (ern = pthread_rwlock_wrlock(rw_p)) {
+    ern = pthread_rwlock_wrlock(&lock->lock);
+    if (ern) {
         printf("pthread_rwlock_wrlock: (%d) %s", ern, strerror(ern)) ;
         exit(1);
     }
-
 }
 
 void oc_crt_unlock(Oc_crt_rw_lock * lock)
 {
     int ern;
-    pthread_rwlock_t *rw_p = (pthread_rwlock_t*) lock;
 
-    if (ern = pthread_rwlock_unlock(rw_p)) {
+    ern = pthread_rwlock_unlock(&lock->lock);
+    if (ern) {
         printf("pthread_rwlock_unlock: (%d) %s", ern, strerror(ern)) ;
         exit(1);
     }
@@ -156,28 +155,31 @@ int oc_crt_get_thread(void)
 void oc_crt_sema_init(Oc_crt_sema * sema_p, int value)
 {
     int ern;
-    sem_t *sem_p = (sem_t *) sema_p;
     
-    if (ern = sem_init(sem_p, 0, value)) 
+    ern = sem_init(&sema_p->sem, 0, value);
+    if (ern) {
         ERR(("sem_init: (%d) %s", ern, strerror(ern))) ;
+    }
 }
 
 void oc_crt_sema_post(Oc_crt_sema * sema_p)
 {
     int ern;
-    sem_t *sem_p = (sem_t *) sema_p;
 
-    if (ern = sem_post (sem_p))
+    ern = sem_post (&sema_p->sem);
+    if (ern) {
         ERR(("sem_post: (%d) %s", ern, strerror(ern))) ;
+    }
 }
 
 void oc_crt_sema_wait(Oc_crt_sema * sema_p)
 {
     int ern;
-    sem_t *sem_p = (sem_t *) sema_p;
 
-    if (ern = sem_wait(sem_p))
+    ern = sem_wait(&sema_p->sem);
+    if (ern) {
         ERR(("sem_wait: (%d) %s", ern, strerror(ern))) ;
+    }
 }
 
 void oc_crt_create_task(const char * name_p, void (*run_p) (void *), void * arg_p)

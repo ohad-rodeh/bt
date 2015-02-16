@@ -70,6 +70,8 @@ void oc_crt_create_task_b(const char * name_p,
                           void (*run_p) (void *),
                           void * arg_p);
 
+void oc_crt_yield_task();
+
 //Oc_crt_task *oc_crt_get_current_task(void);
 
 // kills all tasks except current one

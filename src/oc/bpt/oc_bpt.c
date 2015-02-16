@@ -651,7 +651,7 @@ void oc_bpt_query_b(
         r_p->pm_pages += 3;   
 
         // the number of disk-pages needed depends on the number of inserted keys
-        nkeys = (int) param;
+        nkeys = *(int*) ((void*)param);
         num_iters = 1 + (nkeys / (cfg_p->max_num_ent_leaf_node/2));
         r_p->fs_pages += num_iters * OC_BPT_MAX_HEIGHT;
         break;

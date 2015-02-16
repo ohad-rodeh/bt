@@ -40,6 +40,7 @@
 #include <stdlib.h>
 #include <malloc.h>
 
+#include "pl_trace_base.h"
 #include "oc_xt_int.h"
 #include "oc_xt_test_utl.h"
 

@@ -90,7 +90,7 @@ Pl_utl_config pl_utl_cfg = {0,
                             0,
                             0,                            
                             {pthread_create_fun,
-                             NULL, //disk_rw
+                             disk_rw,
                              pl_utl_bsema_i_create,
                              pl_utl_bsema_i_destroy,
                              pl_utl_bsema_i_post,
@@ -375,8 +375,8 @@ static void pl_utl_sema_i_wait(struct Pl_utl_sema *_sema_p)
     ss_debugassert(PL_UTL_SEMA_MAGIC == sema_p->magic);
 
     rc = sem_wait(&sema_p->os_semaphore);
-//    if (rc != 0)
-//       ERR(("sem_wait failed (errno=%d) %s", rc, strerror(rc)));
+    if (rc != 0)
+       ERR(("sem_wait failed (errno=%d) %s", rc, strerror(rc)));
 }
 
 

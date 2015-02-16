@@ -40,8 +40,10 @@
 #include <stdlib.h>
 #include <malloc.h>
 #include <semaphore.h>
+#include <unistd.h>
 
 #include "pl_int.h"
+#include "oc_crt_int.h"
 #include "oc_bpt_int.h"
 #include "oc_bpt_test_utl.h"
 #include "oc_bpt_alt.h"
@@ -322,7 +324,6 @@ static void test_init_fun(void)
 
 int main(int argc, char *argv[])
 {
-    sem_t sema ;
     Oc_crt_config crt_conf;
     
     // initialize the tracing facility 
@@ -342,13 +343,17 @@ int main(int argc, char *argv[])
     oc_crt_default_config(&crt_conf);
     crt_conf.init_fun = test_init_fun;
 
+    // why do we need this? 
+    num_tasks = 10;
+
     //  We need more pages for the lookup-range function
     crt_conf.stack_page_size = 20;  
     oc_crt_init_full(&crt_conf);
 
     // go to sleep forever
-    sem_init(&sema,0,0);
-    sem_wait(&sema);
+    //sem_init(&sema,0,0);
+    //sem_wait(&sema);
+    sleep(10000);
     return 0;
 }    
 

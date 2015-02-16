@@ -65,13 +65,21 @@ OBJ = \
 
 all :  \
        $(BINDIR)/oc_bpt_test_st \
-       $(BINDIR)/oc_bpt_test_clone_st
+       $(BINDIR)/oc_bpt_test_clone_st \
+       $(BINDIR)/oc_bpt_test_mt
 
 
 $(BINDIR)/oc_bpt_test_st : ${OBJ} \
 			   ${OBJDIR}/oc_bpt_test_st.o 
 	$(GENEXE) -o $(BINDIR)/oc_bpt_test_st \
 	      ${OBJDIR}/oc_bpt_test_st.o \
+	      $(OBJ) \
+	   -L$(OSDROOT)/lib -lpl -lpthread
+
+$(BINDIR)/oc_bpt_test_mt : ${OBJ} \
+			   ${OBJDIR}/oc_bpt_test_mt.o 
+	$(GENEXE) -o $(BINDIR)/oc_bpt_test_mt \
+	      ${OBJDIR}/oc_bpt_test_mt.o \
 	      $(OBJ) \
 	   -L$(OSDROOT)/lib -lpl -lpthread
 

@@ -39,7 +39,10 @@
 #include <string.h>
 #include <stdlib.h>
 
+#include "pl_trace.h"
+#include "pl_trace_base.h"
 #include "oc_utl.h"
+#include "oc_crt_int.h"
 #include "oc_xt_int.h"
 #include "oc_xt_alt.h"
 #include "oc_xt_test_fs.h"
