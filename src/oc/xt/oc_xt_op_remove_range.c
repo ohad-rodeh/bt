@@ -494,7 +494,6 @@ static void wrap_fix_b(
         struct Oc_xt_key *dummy_key_p;
         int new_idx;
         uint64 addr;
-        
         // recompute the index, it may have changed
         addr = oc_xt_nd_index_lookup_key(wu_p, s_p, father_p,
                                          oc_xt_nd_min_key(s_p, child_p),

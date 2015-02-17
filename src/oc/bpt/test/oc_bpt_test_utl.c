@@ -56,22 +56,12 @@
 
 static Oc_bpt_cfg cfg;
 static Oc_bpt_alt_cfg alt_cfg;
+static Oc_bpt_test_param *param;
 
 #define NODE_SIZE (1256)
 typedef uint32 Oc_bpt_test_key;
 typedef uint32 Oc_bpt_test_data;
 
-int num_rounds = 100;
-int max_int = 200;
-int num_tasks = 10;
-int num_ops_per_task = 10;
-int max_num_clones = 2;
-bool verbose = FALSE;
-bool statistics = FALSE;
-int max_root_fanout = 5;
-int max_non_root_fanout = 5;
-int min_fanout = 2;
-int total_ops = 0;
 Oc_bpt_test_utl_type test_type = OC_BPT_TEST_UTL_ANY;
 
 // work-unit used for validate and display
@@ -564,9 +554,9 @@ void oc_bpt_test_utl_btree_insert(
 {
     bool rc1, rc2;
     
-    total_ops++;
+    param->total_ops++;
     
-    if (verbose) printf("// insert %lu TID=%Lu\n", key, get_tid(s_p));
+    if (param->verbose) printf("// insert %lu TID=%Lu\n", key, get_tid(s_p));
 
     rc1 = oc_bpt_insert_key_b(wu_p,
                               &s_p->bpt_s,
@@ -587,7 +577,7 @@ void oc_bpt_test_utl_btree_insert(
         }
     }
     
-    if (verbose && (*check_eq_pio))
+    if (param->verbose && (*check_eq_pio))
         print_fun();
 }
 
@@ -631,7 +621,7 @@ void oc_bpt_test_utl_btree_lookup(
     uint32 key,
     bool *check_eq_pio)
 {
-    if (verbose) {
+    if (param->verbose) {
         printf("// lookup %lu  TID=%Lu\n", key, get_tid(s_p));  
         fflush(stdout);
     }
@@ -648,9 +638,9 @@ void oc_bpt_test_utl_btree_remove_key(
 {
     bool rc1, rc2;
     
-    total_ops++;
+    param->total_ops++;
 
-    if (verbose) printf("// remove %lu TID=%Lu\n", key, get_tid(s_p));
+    if (param->verbose) printf("// remove %lu TID=%Lu\n", key, get_tid(s_p));
     rc1 = oc_bpt_remove_key_b(
         wu_p, 
         &s_p->bpt_s,
@@ -670,7 +660,7 @@ void oc_bpt_test_utl_btree_remove_key(
     }
 
     // print only if a key has actually been removed
-    if (verbose && (*check_eq_pio) && rc1)
+    if (param->verbose && (*check_eq_pio) && rc1)
         print_fun();
 }
 
@@ -678,11 +668,11 @@ void oc_bpt_test_utl_btree_delete(
     Oc_wu *wu_p,
     Oc_bpt_test_state *s_p)    
 {
-    if (verbose) printf("// btree delete\n");
+    if (param->verbose) printf("// btree delete\n");
     oc_bpt_delete_b(wu_p, &s_p->bpt_s);
     oc_bpt_alt_delete_b(wu_p, &s_p->alt_s);
 
-    if (verbose) print_fun();
+    if (param->verbose) print_fun();
 }
 
 // create a random number between 0 and [top]
@@ -704,8 +694,8 @@ void oc_bpt_test_utl_btree_lookup_range(
     uint32 *key_array1, *key_array2, *data_array1, *data_array2;
     int n_keys;
 
-    total_ops++;
-    if (verbose)
+    param->total_ops++;
+    if (param->verbose)
         printf("// lookup_range [lo_key=%lu, hi_key=%lu] TID=%Lu\n",
                lo_key, hi_key, get_tid(s_p));
 
@@ -798,9 +788,9 @@ void oc_bpt_test_utl_btree_insert_range(
     if (len > 30)
         ERR(("The test current supports up to insert-ranges of length 30"));
 
-    total_ops++;
+    param->total_ops++;
     
-    if (verbose) printf("// insert_range key=%lu len=%lu\n", lo_key, len);
+    if (param->verbose) printf("// insert_range key=%lu len=%lu\n", lo_key, len);
     
     // setup the array
     for (i=0; i<len ; i++) {
@@ -825,7 +815,7 @@ void oc_bpt_test_utl_btree_insert_range(
         }
     }
     
-    if (verbose && (*check_eq_pio))
+    if (param->verbose && (*check_eq_pio))
         print_fun();
 }
 
@@ -837,8 +827,8 @@ void oc_bpt_test_utl_btree_remove_range(
 {
     int rc1, rc2;
     
-    total_ops++;
-    if (verbose)
+    param->total_ops++;
+    if (param->verbose)
         printf("// remove_range lo_key=%lu hi_key=%lu\n", lo_key, hi_key);
     
     rc1 = oc_bpt_remove_range_b(wu_p, &s_p->bpt_s,
@@ -858,9 +848,9 @@ void oc_bpt_test_utl_btree_remove_range(
         }
     }
 
-    if (verbose && (*check_eq_pio)) {
+    if (param->verbose && (*check_eq_pio)) {
         if (0 == rc1) printf("    // no keys removed during remove-range\n");
-        if (verbose) print_fun();
+        if (param->verbose) print_fun();
     }
 }
 
@@ -868,7 +858,7 @@ bool oc_bpt_test_utl_btree_compare_and_verify(Oc_bpt_test_state *s_p)
 {
     bool rc = TRUE;
     
-    if (verbose) {printf("// compare and verify\n"); fflush(stdout);}
+    if (param->verbose) {printf("// compare and verify\n"); fflush(stdout);}
 
 #if 0
     int i
@@ -879,7 +869,7 @@ bool oc_bpt_test_utl_btree_compare_and_verify(Oc_bpt_test_state *s_p)
     }
 #endif
     
-    oc_bpt_test_utl_btree_lookup_range(&utl_wu, s_p, 0, max_int, &rc);
+    oc_bpt_test_utl_btree_lookup_range(&utl_wu, s_p, 0, param->max_int, &rc);
     if (!rc) return FALSE;
     else return TRUE;
 }
@@ -893,12 +883,12 @@ void oc_bpt_test_utl_btree_clone(
     struct Oc_bpt_test_state* trg_p
     )
 {
-    if (verbose) printf("// clone new-TID=%Lu\n", get_tid(trg_p));
+    if (param->verbose) printf("// clone new-TID=%Lu\n", get_tid(trg_p));
     
     oc_bpt_clone_b(wu_p, &src_p->bpt_s, &trg_p->bpt_s);
     oc_bpt_alt_clone_b(wu_p, &src_p->alt_s, &trg_p->alt_s);
 
-    if (verbose) print_fun();
+    if (param->verbose) print_fun();
 }
 
 static int g_cnt = 0;
@@ -954,15 +944,15 @@ void oc_bpt_test_utl_init(void)
     vd_create();
     oc_bpt_init();
     oc_bpt_test_fs_create("BPT free-space", 10000, FALSE);
-    
+
     // setup 
     memset(&cfg, 0, sizeof(cfg));
     cfg.key_size = sizeof(Oc_bpt_test_key);
     cfg.data_size = sizeof(Oc_bpt_test_data);
     cfg.node_size = NODE_SIZE;
-    cfg.root_fanout = max_root_fanout;
-    cfg.non_root_fanout = max_non_root_fanout;
-    cfg.min_num_ent = min_fanout;
+    cfg.root_fanout = param->max_root_fanout;
+    cfg.non_root_fanout = param->max_non_root_fanout;
+    cfg.min_num_ent = param->min_fanout;
     cfg.node_alloc = node_alloc;
     cfg.node_dealloc = node_dealloc;
     cfg.node_get_sl = node_get_sl;
@@ -999,8 +989,23 @@ void oc_bpt_test_utl_set_validate_fun(bool (*validate_fun_i)(void))
     validate_fun = validate_fun_i;
 }
 
+
 bool oc_bpt_test_utl_parse_cmd_line(int argc, char *argv[])
 {
+    // set default values
+    param = (Oc_bpt_test_param*) malloc(sizeof(Oc_bpt_test_param));
+    param->num_rounds = 100;
+    param->max_int = 200;
+    param->num_tasks = 10;
+    param->num_ops_per_task = 10;
+    param->max_num_clones = 2;
+    param->verbose = FALSE;
+    param->statistics = FALSE;
+    param->max_root_fanout = 5;
+    param->max_non_root_fanout = 5;
+    param->min_fanout = 2;
+    param->total_ops = 0;
+    
     int i = 1;
 
     for (i=1;i<argc;i++) {
@@ -1019,50 +1024,50 @@ bool oc_bpt_test_utl_parse_cmd_line(int argc, char *argv[])
             exit(0);
         }
         else if (strcmp(argv[i], "-verbose") == 0) {
-            verbose = TRUE;
+            param->verbose = TRUE;
         }
         else if (strcmp(argv[i], "-stat") == 0) {
-            statistics = TRUE;
+            param->statistics = TRUE;
         }       
         else if (strcmp(argv[i], "-max_int") == 0) {
 	    if (++i >= argc)
                 return FALSE;
-            max_int = atoi(argv[i]);
+            param->max_int = atoi(argv[i]);
         }
         else if (strcmp(argv[i], "-num_rounds") == 0) {
 	    if (++i >= argc)
                 return FALSE;
-            num_rounds = atoi(argv[i]);
+            param->num_rounds = atoi(argv[i]);
         }
         else if (strcmp(argv[i], "-num_tasks") == 0) {
 	    if (++i >= argc)
                 return FALSE;
-            num_tasks = atoi(argv[i]);
+            param->num_tasks = atoi(argv[i]);
         }        
         else if (strcmp(argv[i], "-num_ops_per_task") == 0) {
 	    if (++i >= argc)
                 return FALSE;
-            num_ops_per_task = atoi(argv[i]);
+            param->num_ops_per_task = atoi(argv[i]);
         }        
         else if (strcmp(argv[i], "-max_num_clones") == 0) {
 	    if (++i >= argc)
                 return FALSE;
-            max_num_clones = atoi(argv[i]);
+            param->max_num_clones = atoi(argv[i]);
         }        
         else if (strcmp(argv[i], "-max_root_fanout") == 0) {
 	    if (++i >= argc)
                 return FALSE;
-            max_root_fanout = atoi(argv[i]);
+            param->max_root_fanout = atoi(argv[i]);
         }        
         else if (strcmp(argv[i], "-max_non_root_fanout") == 0) {
 	    if (++i >= argc)
                 return FALSE;
-            max_non_root_fanout = atoi(argv[i]);
+            param->max_non_root_fanout = atoi(argv[i]);
         }        
         else if (strcmp(argv[i], "-min_fanout") == 0) {
 	    if (++i >= argc)
                 return FALSE;
-            min_fanout = atoi(argv[i]);
+            param->min_fanout = atoi(argv[i]);
         }        
         else if (strcmp(argv[i], "-test") == 0) {
 	    if (++i >= argc)
@@ -1085,24 +1090,30 @@ bool oc_bpt_test_utl_parse_cmd_line(int argc, char *argv[])
     return TRUE;
 }
 
+Oc_bpt_test_param *oc_bpt_test_utl_get_param()
+{
+    return param;
+}
+
+
 void oc_bpt_test_utl_help_msg (void)
 {
     printf("Usage: oc_bpt_test\n");
     printf("\t -max_int <range of keys is [0 ... max_int]>  [default=%d]\n",
-           max_int);
+           param->max_int);
     printf("\t -num_rounds <number of rounds to execute>  [default=%d]\n",
-           num_rounds);
+           param->num_rounds);
     printf("\t -num_tasks <number of concurrent tasks>  [default=%d]\n",
-           num_tasks); 
+           param->num_tasks); 
     printf("\t -num_ops_per_task  <for multi-task-clone test: ops per task iteration> [default=10]\n");
     printf("\t -max_num_clones <maximal number of b-tree clones> [default=%d]\n",
-           max_num_clones); 
+           param->max_num_clones); 
     printf("\t -max_root_fanout <maximal number of entries in a root node>  [default=%d]\n",
-           max_root_fanout);
+           param->max_root_fanout);
     printf("\t -max_non_root_fanout <maximal number of entries in a non-root node>  [default=%d]\n",
-           max_non_root_fanout);
+           param->max_non_root_fanout);
     printf("\t -min_fanout <minimal number of entries in a node>  [default=%d]\n",
-           min_fanout);
+           param->min_fanout);
     printf("\t -verbose\n");
     printf("\t -stat\n");
     printf("\t -test <small_trees|large_trees|small_trees_w_ranges|small_trees_mixed>\n");    

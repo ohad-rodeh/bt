@@ -51,7 +51,7 @@ PL = $(OSDROOT)/src/pl
 CC = gcc
 
 #CFLAGS = -D_GNU_SOURCE -g -Wpointer-to-int-cast ##-Wall
-CFLAGS = -D_GNU_SOURCE -g -Wall
+CFLAGS = -D_GNU_SOURCE -g -Wall 
 
 LFLAGS = -g
 MKFLAGS =

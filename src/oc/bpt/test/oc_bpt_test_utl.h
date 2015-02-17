@@ -43,17 +43,19 @@
 #include "oc_wu_s.h"
 
 // configuration defined on the command line
-extern int num_rounds;
-extern int max_int;
-extern int num_tasks;
-extern int num_ops_per_task;
-extern int max_num_clones;
-extern bool verbose;
-extern bool statistics;
-extern int max_root_fanout;
-extern int max_non_root_fanout;
-extern int min_fanout;
-extern int total_ops;
+typedef struct Oc_bpt_test_param {
+    int num_rounds;
+    int max_int;
+    int num_tasks;
+    int num_ops_per_task;
+    int max_num_clones;
+    bool verbose;
+    bool statistics;
+    int max_root_fanout;
+    int max_non_root_fanout;
+    int min_fanout;
+    int total_ops;
+} Oc_bpt_test_param;
 
 typedef enum Oc_bpt_test_utl_type {
     OC_BPT_TEST_UTL_ANY,
@@ -188,4 +190,6 @@ uint32 oc_bpt_test_utl_random_number(uint32 top);
 void oc_bpt_test_utl_fs_verify(int num_blocks);
 
 struct Oc_bpt_state *oc_bpt_test_utl_get_state(struct Oc_bpt_test_state *s_p);
+Oc_bpt_test_param *oc_bpt_test_utl_get_param();
+
 #endif

@@ -1871,11 +1871,10 @@ uint64 oc_xt_nd_insert_into_leaf(
 {
     Oc_xt_nd_hdr *hdr_p = get_hdr(node_p);
     struct Oc_xt_nd_array *arr_p = get_start_array(s_p, node_p);
-    int loc, insert_loc, rc=0, max_num_ent;
+    int loc, insert_loc, rc=0;
     struct Oc_xt_key *tmp_key_p;
     
     oc_utl_debugassert(oc_xt_nd_is_leaf(s_p, node_p));
-    max_num_ent = oc_xt_nd_max_ent_in_node(s_p, node_p);
     oc_xt_trace_wu_lvl(3, OC_EV_XT_ND_INSERT_INTO_LEAF, wu_p,
                        "[%s] ext=%s  used_entries=%d",
                        oc_xt_nd_string_of_node(s_p, node_p),

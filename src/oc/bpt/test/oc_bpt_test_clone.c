@@ -51,7 +51,7 @@
 // An array containing pointers to clones
 static struct Oc_bpt_test_state **clone_array;
 static int num_clones = 0;
-
+static Oc_bpt_test_param *param = NULL;
 static void oc_bpt_test_clone_validate_fs(void);
 /******************************************************************/
 
@@ -98,17 +98,18 @@ static void oc_bpt_test_clone_validate_fs(void)
 
 void oc_bpt_test_clone_init_ds(void)
 {
+    param = oc_bpt_test_utl_get_param();
     clone_array = pl_mm_malloc(
-        sizeof(struct Oc_bpt_test_state *) * max_num_clones);
+        sizeof(struct Oc_bpt_test_state *) * param->max_num_clones);
     
     memset(clone_array,
            0,
-           sizeof(struct Oc_bpt_test_state *) * max_num_clones);
+           sizeof(struct Oc_bpt_test_state *) * param->max_num_clones);
 }
 
 bool oc_bpt_test_clone_can_create_more(void)
 {
-    return (num_clones < max_num_clones);
+    return (num_clones < param->max_num_clones);
 }
 
 bool oc_bpt_test_clone_num_live(void)
@@ -157,7 +158,7 @@ bool oc_bpt_test_clone_just_validate_all(void)
 
 void oc_bpt_test_clone_add(struct Oc_bpt_test_state *s_p)
 {
-    if (max_num_clones == num_clones)
+    if (param->max_num_clones == num_clones)
         ERR(("The array of clones is full"));
 
     clone_array[num_clones] = s_p;

@@ -56,6 +56,8 @@ static void test_init_fun(void);
 static void small_trees (void);
 static void print_and_exit(void);
 
+static Oc_bpt_test_param *param = NULL;
+
 /******************************************************************/
 
 // Print the entire clone-set exit
@@ -89,7 +91,7 @@ static void small_trees (void)
         oc_bpt_test_clone_add(s_p);
         wu.po_id++;
         
-        for (i=0; i<num_rounds; i++)
+        for (i=0; i<param->num_rounds; i++)
         {
             bool rc = TRUE;
             int choice;
@@ -105,21 +107,21 @@ static void small_trees (void)
                 oc_bpt_test_utl_btree_remove_key(
                     &wu,
                     s_p, 
-                    oc_bpt_test_utl_random_number(max_int),
+                    oc_bpt_test_utl_random_number(param->max_int),
                     &rc);
                 break;
             case 1:
                 oc_bpt_test_utl_btree_insert(
                     &wu,
                     s_p, 
-                    oc_bpt_test_utl_random_number(max_int),
+                    oc_bpt_test_utl_random_number(param->max_int),
                     &rc);            
                 break;
             case 2:
                 oc_bpt_test_utl_btree_lookup(
                     &wu,
                     s_p, 
-                    oc_bpt_test_utl_random_number(max_int),
+                    oc_bpt_test_utl_random_number(param->max_int),
                     &rc);          
                 break;
 
@@ -127,12 +129,12 @@ static void small_trees (void)
                 oc_bpt_test_utl_btree_insert_range(
                     &wu,
                     s_p, 
-                    oc_bpt_test_utl_random_number(max_int),
+                    oc_bpt_test_utl_random_number(param->max_int),
                     oc_bpt_test_utl_random_number(10),
                     &rc);          
                 break;
             case 4:
-                start = oc_bpt_test_utl_random_number(max_int);
+                start = oc_bpt_test_utl_random_number(param->max_int);
                 oc_bpt_test_utl_btree_lookup_range(
                     &wu,
                     s_p, 
@@ -141,7 +143,7 @@ static void small_trees (void)
                     &rc); 
                 break;
             case 5:
-                start = oc_bpt_test_utl_random_number(max_int);
+                start = oc_bpt_test_utl_random_number(param->max_int);
                 oc_bpt_test_utl_btree_remove_range(
                     &wu,
                     s_p, 
@@ -152,23 +154,23 @@ static void small_trees (void)
 
             case 6:
                 // removing a lot of entries so as to reduce tree size
-                start = oc_bpt_test_utl_random_number(max_int);
+                start = oc_bpt_test_utl_random_number(param->max_int);
                 
                 oc_bpt_test_utl_btree_remove_range(
                     &wu,
                     s_p, 
                     start, 
-                    start + oc_bpt_test_utl_random_number(max_int/3),
+                    start + oc_bpt_test_utl_random_number(param->max_int/3),
                     &rc);                   
                 break;
             case 7:
                 // long lookup-range
-                start = oc_bpt_test_utl_random_number(max_int),
+                start = oc_bpt_test_utl_random_number(param->max_int),
                 oc_bpt_test_utl_btree_lookup_range(
                     &wu,
                     s_p, 
                     start,
-                    start + oc_bpt_test_utl_random_number(max_int/3),
+                    start + oc_bpt_test_utl_random_number(param->max_int/3),
                     &rc);
                     break;
                 
@@ -214,7 +216,7 @@ static void small_trees (void)
             oc_bpt_test_utl_finalize(oc_bpt_test_clone_num_live());            
         }
 
-        if (statistics) oc_bpt_test_utl_statistics(s_p);         
+        if (param->statistics) oc_bpt_test_utl_statistics(s_p);         
 
         oc_bpt_test_clone_delete_all(&wu);
         oc_bpt_test_utl_finalize(0);
@@ -240,7 +242,7 @@ static void test_init_fun(void)
     // verify the free-space has no block allocated
     oc_bpt_test_utl_fs_verify(0);
     
-    printf("   // total_ops=%d\n", total_ops);
+    printf("   // total_ops=%d\n", param->total_ops);
     oc_bpt_dbg_output_end();
 }
 
@@ -251,6 +253,7 @@ int main(int argc, char *argv[])
 
     if (oc_bpt_test_utl_parse_cmd_line(argc, argv) == FALSE)
         oc_bpt_test_utl_help_msg();
+    param = oc_bpt_test_utl_get_param();
 
     // done initializing tracing
     pl_trace_base_init_done();
