@@ -17,12 +17,12 @@ then
 	exit 1
 fi
 
-#if test ! -x $oc_bpt_test_mt
-#then
-#	echo Error: executable $oc_bpt_test_mt not found
-#	echo aborting
-#	exit 1
-#fi
+if test ! -x $oc_bpt_test_mt
+then
+	echo Error: executable $oc_bpt_test_mt not found
+	echo aborting
+	exit 1
+fi
 
 if test ! -x $oc_bpt_test_clone_st
 then
@@ -107,7 +107,7 @@ function run_clone_mt_test ()
 #-----------------------------------------------------------------
 # running the test with various error-injection parameters
 
-std="no"
+std="yes"
 multi_threaded_tests="no"
 
 if [[ $std == "yes" ]]

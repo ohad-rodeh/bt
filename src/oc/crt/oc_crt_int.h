@@ -58,17 +58,9 @@ uint64 oc_crt_get_time_millis(void);
  *
  * can -only- be called from the pthread running co-routines.
  */
-void oc_crt_create_task(const char * name_p,
-                        void (*run_p) (void *),
+int oc_crt_create_task(const char * name_p,
+                        void *(*start_routine) (void *),
                         void * arg_p);
-
-/* Wait until a task-structure is available, and then start the task.
- * 
- * can -only- be called by a co-routine.
- */
-void oc_crt_create_task_b(const char * name_p,
-                          void (*run_p) (void *),
-                          void * arg_p);
 
 void oc_crt_yield_task();
 

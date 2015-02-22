@@ -56,7 +56,22 @@
 
 static Oc_bpt_cfg cfg;
 static Oc_bpt_alt_cfg alt_cfg;
-static Oc_bpt_test_param *param;
+
+// set default values
+static Oc_bpt_test_param param_global = {
+    .num_rounds = 100,
+    .max_int = 200,
+    .num_tasks = 10,
+    .num_ops_per_task = 10,
+    .max_num_clones = 2,
+    .verbose = FALSE,
+    .statistics = FALSE,
+    .max_root_fanout = 5,
+    .max_non_root_fanout = 5,
+    .min_fanout = 2,
+    .total_ops = 0};
+static Oc_bpt_test_param *param = &param_global;
+
 
 #define NODE_SIZE (1256)
 typedef uint32 Oc_bpt_test_key;
@@ -992,20 +1007,6 @@ void oc_bpt_test_utl_set_validate_fun(bool (*validate_fun_i)(void))
 
 bool oc_bpt_test_utl_parse_cmd_line(int argc, char *argv[])
 {
-    // set default values
-    param = (Oc_bpt_test_param*) malloc(sizeof(Oc_bpt_test_param));
-    param->num_rounds = 100;
-    param->max_int = 200;
-    param->num_tasks = 10;
-    param->num_ops_per_task = 10;
-    param->max_num_clones = 2;
-    param->verbose = FALSE;
-    param->statistics = FALSE;
-    param->max_root_fanout = 5;
-    param->max_non_root_fanout = 5;
-    param->min_fanout = 2;
-    param->total_ops = 0;
-    
     int i = 1;
 
     for (i=1;i<argc;i++) {

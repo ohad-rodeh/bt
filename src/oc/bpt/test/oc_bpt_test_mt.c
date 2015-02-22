@@ -78,7 +78,7 @@ static bool validate_tree(void)
     return oc_bpt_test_utl_btree_validate(s_p);
 }
 
-static void insert_thread(void *dummy)
+static void* insert_thread(void *dummy)
 {
     int i;
     Oc_wu wu;
@@ -96,9 +96,10 @@ static void insert_thread(void *dummy)
             &rc);
     
     oc_crt_sema_post(&sema);    
+    return NULL;
 }
 
-static void remove_thread(void *dummy)
+static void* remove_thread(void *dummy)
 {
     int i;
     Oc_wu wu;
@@ -116,9 +117,10 @@ static void remove_thread(void *dummy)
             &rc);
     
     oc_crt_sema_post(&sema);    
+    return NULL;
 }
 
-static void random_thread(void *_small_tree)
+static void* random_thread(void *_small_tree)
 {
     bool small_tree = (bool) small_tree;
     int i, start;
@@ -213,6 +215,7 @@ static void random_thread(void *_small_tree)
     }
     
     oc_crt_sema_post(&sema);    
+    return NULL;
 }
 
 static void multi_threaded_test (void)
@@ -228,8 +231,10 @@ static void multi_threaded_test (void)
     oc_bpt_test_utl_btree_create(&wu, s_p);
 
     // run insert-threads
-    for (i=0; i<param->num_tasks; i++)
+    for (i=0; i<param->num_tasks; i++) {
+        fflush(stdout);
         oc_crt_create_task("insert_thread", insert_thread, NULL);
+    }
 
     // wait for threads to complete
     for (i=0; i<param->num_tasks; i++)

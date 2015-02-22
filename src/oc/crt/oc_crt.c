@@ -182,15 +182,19 @@ void oc_crt_sema_wait(Oc_crt_sema * sema_p)
     }
 }
 
-void oc_crt_create_task(const char * name_p, void (*run_p) (void *), void * arg_p)
+int oc_crt_create_task(const char * name_p, 
+                        void *(*start_routine) (void *),
+                        void * arg_p)
 {
     int id;
+    pthread_attr_t attr;
 
-    if (pthread_create((pthread_t *)&id,
-                       NULL,
-                       (void *(*)(void *)) run_p,
-                       arg_p) != 0)
+    pthread_attr_init(&attr);
+    if (pthread_create((pthread_t *)&id, &attr, start_routine, arg_p) != 0)
         ERR(("could not create a thread"));
+    pthread_attr_destroy(&attr);
+
+    return id;
 }
 
 /******************************************************************/
