@@ -1,6 +1,6 @@
 #*************************************************************#
 #
-# Copyright (c) 2014, Ohad Rodeh, IBM Research
+# Copyright (c) 2014-2015, Ohad Rodeh, IBM Research
 # All rights reserved.
 # 
 # Redistribution and use in source and binary forms, with or without
