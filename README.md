@@ -55,7 +55,7 @@ The Oc_wu structure that is passed around by the code, describe a "work-unit". T
 
 TODO
 ====
-Revive the multi-threaded tests, so they will work correctly pthreads. 
+Revive the XT multi-threaded tests. This is already done for the BTP module. 
 
 
 
