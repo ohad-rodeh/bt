@@ -2,16 +2,16 @@
 /*
  * Copyright (c) 2014-2015, Ohad Rodeh, IBM Research
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met: 
- * 
+ * modification, are permitted provided that the following conditions are met:
+ *
  * 1. Redistributions of source code must retain the above copyright notice, this
- *    list of conditions and the following disclaimer. 
+ *    list of conditions and the following disclaimer.
  * 2. Redistributions in binary form must reproduce the above copyright notice,
  *    this list of conditions and the following disclaimer in the documentation
- *    and/or other materials provided with the distribution. 
- * 
+ *    and/or other materials provided with the distribution.
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -22,17 +22,17 @@
  * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  * The views and conclusions contained in the software and documentation are those
- * of the authors and should not be interpreted as representing official policies, 
+ * of the authors and should not be interpreted as representing official policies,
  * either expressed or implied, of IBM Research.
- * 
+ *
  */
 /**************************************************************/
 /****************************************************************/
 // Basic tracing facility
 /****************************************************************/
-/* To use this API properly, do: 
+/* To use this API properly, do:
  *
  * 1) Initialize:
  *     pl_trace_base_init
@@ -44,7 +44,7 @@
  * The above set of operations is intended to be performed while
  * reading the command line arguments.
  *
- * None of the APIs in this module are thread-safe. 
+ * None of the APIs in this module are thread-safe.
  */
 
 #ifndef PL_TRACE_BASE_H
@@ -81,15 +81,15 @@ void pl_trace_base_init(void);
 /* Add a [tag, level] pair to the set of traced tags.
  * This is a low-level API, it is easier to use the
  *     [pl_trace_base_add_string_tag_full]
- * function. The nicer API is supported only for user-mode. 
+ * function. The nicer API is supported only for user-mode.
  */
 void pl_trace_base_add_tag_lvl(Pl_trace_base_tag tag, int level);
 
-// Set the debug level. The default is 1. This can be done once at the most. 
+// Set the debug level. The default is 1. This can be done once at the most.
 void pl_trace_base_set_level(int level);
 
 /* The stage of initialization is complete. From now on no more -add_tag-
- * calls will be performed. 
+ * calls will be performed.
  */
 void pl_trace_base_init_done(void);
 
