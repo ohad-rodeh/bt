@@ -2,16 +2,16 @@
 /*
  * Copyright (c) 2014-2015, Ohad Rodeh, IBM Research
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met: 
- * 
+ * modification, are permitted provided that the following conditions are met:
+ *
  * 1. Redistributions of source code must retain the above copyright notice, this
- *    list of conditions and the following disclaimer. 
+ *    list of conditions and the following disclaimer.
  * 2. Redistributions in binary form must reproduce the above copyright notice,
  *    this list of conditions and the following disclaimer in the documentation
- *    and/or other materials provided with the distribution. 
- * 
+ *    and/or other materials provided with the distribution.
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -22,18 +22,18 @@
  * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  * The views and conclusions contained in the software and documentation are those
- * of the authors and should not be interpreted as representing official policies, 
+ * of the authors and should not be interpreted as representing official policies,
  * either expressed or implied, of IBM Research.
- * 
+ *
  */
 /**************************************************************/
 /**********************************************************************/
 /* OC_BPT_TEST_FS.H
  *
- * A free-space implementation that helps tests the correct 
- * functioning of the b-tree. 
+ * A free-space implementation that helps tests the correct
+ * functioning of the b-tree.
  */
 /**********************************************************************/
 #include <malloc.h>
@@ -60,7 +60,7 @@ struct Oc_bpt_test_fs_ctx {
 
     char desc[30];
 
-    // verbose mode? 
+    // verbose mode?
     bool verbose;
 };
 
@@ -80,7 +80,7 @@ static struct Oc_bpt_test_fs_ctx *fs_create(
     bool verbose)
 {
     struct Oc_bpt_test_fs_ctx *fs_p;
-    
+
     fs_p = (struct Oc_bpt_test_fs_ctx *)
         pl_mm_malloc(sizeof(struct Oc_bpt_test_fs_ctx));
 
@@ -102,7 +102,7 @@ static void fs_free(struct Oc_bpt_test_fs_ctx *fs_p)
 {
     pl_mm_free(fs_p->fs_array);
 
-    // extra sanitation 
+    // extra sanitation
     memset(fs_p, 0, sizeof(struct Oc_bpt_test_fs_ctx));
 
     pl_mm_free(fs_p);
@@ -118,20 +118,20 @@ void oc_bpt_test_fs_create(
     ctx_p = fs_create(str_desc_p, num_blocks, verbose);
 }
 
-// allocate a block 
+// allocate a block
 uint64 oc_bpt_test_fs_alloc(void)
 {
     int i, loc;
 
     oc_utl_assert(ctx_p);
-        
+
     if (ctx_p->verbose) {
         printf("// alloc [%s]\n", ctx_p->desc);
         fflush(stdout);
     }
-    
+
     /* look for a free block. Start searching from the beginning
-     * so as to flush out any error in freeing blocks too early. 
+     * so as to flush out any error in freeing blocks too early.
      */
     for (i=0, loc=-1 ; i<ctx_p->num_blocks; i++) {
         if (!ctx_p->fs_array[i]) {
@@ -158,7 +158,7 @@ void oc_bpt_test_fs_dealloc(uint64 loc)
 {
     oc_utl_assert(ctx_p);
     oc_utl_assert(0 <= loc && loc < ctx_p->num_blocks);
-    
+
     if (ctx_p->verbose) {
         printf("// dealloc [%s] (loc=%Lu)\n", ctx_p->desc, loc);
         fflush(stdout);
@@ -169,7 +169,7 @@ void oc_bpt_test_fs_dealloc(uint64 loc)
 
     if (0 == ctx_p->fs_array[loc])
         ctx_p->tot_alloc--;
-    
+
     oc_utl_assert(ctx_p->tot_alloc >= 0);
 }
 
@@ -185,13 +185,13 @@ void oc_bpt_test_fs_inc_refcount(struct Oc_wu *wu_p, uint64 addr)
 int oc_bpt_test_fs_get_refcount(struct Oc_wu *wu_p, uint64 addr)
 {
     oc_utl_assert(ctx_p);
-    
+
     return (int)ctx_p->fs_array[addr];
 }
 
 /**********************************************************************/
 
-void oc_bpt_test_fs_verify(num_blocks)
+void oc_bpt_test_fs_verify(int num_blocks)
 {
     oc_utl_debugassert(ctx_p);
     oc_utl_assert(num_blocks == ctx_p->tot_alloc);
@@ -215,16 +215,16 @@ void oc_bpt_test_fs_alt_inc_refcount(struct Oc_wu *wu_p, uint64 addr)
     alt_p->fs_array[addr]++;
 }
 
-// compare the alternate block-map 
+// compare the alternate block-map
 bool oc_bpt_test_fs_alt_compare(int num_clones)
 {
     int i;
     bool flag = TRUE;
-            
+
     for (i=0; i<alt_p->num_blocks; i++)
     {
         bool err = FALSE;
-        
+
         if ((alt_p->fs_array[i] == 0 && ctx_p->fs_array[i] != 0) ||
             (alt_p->fs_array[i] != 0 && ctx_p->fs_array[i] == 0))
             err = TRUE;
@@ -234,7 +234,7 @@ bool oc_bpt_test_fs_alt_compare(int num_clones)
 
         if (num_clones < ctx_p->fs_array[i])
             err = TRUE;
-        
+
         if (err)
         {
             printf("There is a discrepency in block %d\n", i);
@@ -244,7 +244,7 @@ bool oc_bpt_test_fs_alt_compare(int num_clones)
             flag = FALSE;
         }
     }
-    
+
     return flag;
 }
 

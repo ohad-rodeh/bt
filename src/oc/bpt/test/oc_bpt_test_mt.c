@@ -2,16 +2,16 @@
 /*
  * Copyright (c) 2014-2015, Ohad Rodeh, IBM Research
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met: 
- * 
+ * modification, are permitted provided that the following conditions are met:
+ *
  * 1. Redistributions of source code must retain the above copyright notice, this
- *    list of conditions and the following disclaimer. 
+ *    list of conditions and the following disclaimer.
  * 2. Redistributions in binary form must reproduce the above copyright notice,
  *    this list of conditions and the following disclaimer in the documentation
- *    and/or other materials provided with the distribution. 
- * 
+ *    and/or other materials provided with the distribution.
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -22,11 +22,11 @@
  * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  * The views and conclusions contained in the software and documentation are those
- * of the authors and should not be interpreted as representing official policies, 
+ * of the authors and should not be interpreted as representing official policies,
  * either expressed or implied, of IBM Research.
- * 
+ *
  */
 /**************************************************************/
 /******************************************************************/
@@ -51,8 +51,7 @@
 /******************************************************************/
 static void print_and_exit(struct Oc_bpt_test_state *s_p);
 static void run_tests(void* dummy);
-static void test_init_fun(void);
-
+static void* test_init_fun(void* dummy);
 static void multi_threaded_test (void);
 /******************************************************************/
 
@@ -70,7 +69,7 @@ static void print_and_exit(struct Oc_bpt_test_state *s_p)
 
 static void display_tree(void)
 {
-    oc_bpt_test_utl_btree_display(s_p, OC_BPT_TEST_UTL_TREE_ONLY);    
+    oc_bpt_test_utl_btree_display(s_p, OC_BPT_TEST_UTL_TREE_ONLY);
 }
 
 static bool validate_tree(void)
@@ -85,7 +84,7 @@ static void* insert_thread(void *dummy)
     Oc_rm_ticket rm_ticket;
     bool rc = FALSE;
 
-    oc_bpt_test_utl_setup_wu(&wu, &rm_ticket);    
+    oc_bpt_test_utl_setup_wu(&wu, &rm_ticket);
     if (param->verbose) printf("   // running insert thread\n");
 
     for (i=0; i<param->num_rounds/param->num_tasks + 10; i++)
@@ -94,8 +93,8 @@ static void* insert_thread(void *dummy)
             s_p,
             oc_bpt_test_utl_random_number(param->max_int),
             &rc);
-    
-    oc_crt_sema_post(&sema);    
+
+    oc_crt_sema_post(&sema);
     return NULL;
 }
 
@@ -112,54 +111,54 @@ static void* remove_thread(void *dummy)
     for (i=0; i<param->num_rounds/param->num_tasks + 10; i++)
         oc_bpt_test_utl_btree_remove_key(
             &wu,
-            s_p,            
+            s_p,
             oc_bpt_test_utl_random_number(param->max_int),
             &rc);
-    
-    oc_crt_sema_post(&sema);    
+
+    oc_crt_sema_post(&sema);
     return NULL;
 }
 
 static void* random_thread(void *_small_tree)
 {
-    bool small_tree = (bool) small_tree;
+    bool small_tree = (bool) _small_tree;
     int i, start;
     Oc_wu wu;
     Oc_rm_ticket rm;
-    
+
     oc_bpt_test_utl_setup_wu(&wu, &rm);
     if (param->verbose) printf("    // running random thread\n");
-    
+
     for (i=0; i<param->num_rounds; i++)
     {
         bool rc = FALSE;
-        
+
         switch (oc_bpt_test_utl_random_number(8)) {
         case 0:
             oc_bpt_test_utl_btree_remove_key(
                 &wu,
-                s_p,                            
+                s_p,
                 oc_bpt_test_utl_random_number(param->max_int),
                 &rc);
             break;
         case 1:
             oc_bpt_test_utl_btree_insert(
                 &wu,
-                s_p,                            
+                s_p,
                 oc_bpt_test_utl_random_number(param->max_int),
-                &rc);            
+                &rc);
             break;
         case 2:
             oc_bpt_test_utl_btree_lookup(
                 &wu,
-                s_p,                            
+                s_p,
                 oc_bpt_test_utl_random_number(param->max_int),
                 &rc);
             break;
         case 3:
             oc_bpt_test_utl_btree_insert_range(
                 &wu,
-                s_p,                            
+                s_p,
                 oc_bpt_test_utl_random_number(param->max_int),
                 oc_bpt_test_utl_random_number(10),
                 &rc);
@@ -168,8 +167,8 @@ static void* random_thread(void *_small_tree)
             start = oc_bpt_test_utl_random_number(param->max_int),
                 oc_bpt_test_utl_btree_lookup_range(
                     &wu,
-                    s_p,                            
-                    start, 
+                    s_p,
+                    start,
                     start + oc_bpt_test_utl_random_number(10),
                     &rc);
             break;
@@ -177,21 +176,21 @@ static void* random_thread(void *_small_tree)
             start = oc_bpt_test_utl_random_number(param->max_int);
             oc_bpt_test_utl_btree_remove_range(
                 &wu,
-                s_p,                            
-                start, 
+                s_p,
+                start,
                 start + oc_bpt_test_utl_random_number(10),
                 &rc);
             break;
-            
+
         case 6:
             if (small_tree) {
                 // remove many entries so as to reduce tree size
                 start = oc_bpt_test_utl_random_number(param->max_int);
-                
+
                 oc_bpt_test_utl_btree_remove_range(
                     &wu,
-                    s_p,                            
-                    start, 
+                    s_p,
+                    start,
                     start + oc_bpt_test_utl_random_number(param->max_int/3),
                     &rc);
             }
@@ -201,7 +200,7 @@ static void* random_thread(void *_small_tree)
             start = oc_bpt_test_utl_random_number(param->max_int);
             oc_bpt_test_utl_btree_lookup_range(
                 &wu,
-                s_p,                            
+                s_p,
                 start,
                 start + oc_bpt_test_utl_random_number(param->max_int/3),
                 &rc);
@@ -213,8 +212,8 @@ static void* random_thread(void *_small_tree)
             break;
         }
     }
-    
-    oc_crt_sema_post(&sema);    
+
+    oc_crt_sema_post(&sema);
     return NULL;
 }
 
@@ -224,10 +223,10 @@ static void multi_threaded_test (void)
     Oc_wu wu;
     bool small_tree;
     Oc_rm_ticket rm;
-    
+
     oc_bpt_test_utl_setup_wu(&wu, &rm);
     oc_crt_sema_init(&sema, 0);
-    s_p = oc_bpt_test_utl_btree_init(&wu, 0);        
+    s_p = oc_bpt_test_utl_btree_init(&wu, 0);
     oc_bpt_test_utl_btree_create(&wu, s_p);
 
     // run insert-threads
@@ -241,7 +240,7 @@ static void multi_threaded_test (void)
         oc_crt_sema_wait(&sema);
 
     // check results
-    oc_bpt_test_utl_finalize(1);                
+    oc_bpt_test_utl_finalize(1);
     for (i=0; i<param->max_int; i++) {
         bool rc = TRUE;
 
@@ -257,21 +256,21 @@ static void multi_threaded_test (void)
     // wait for threads to complete
     for (i=0; i<param->num_tasks; i++)
         oc_crt_sema_wait(&sema);
-    
+
     // check results
-    oc_bpt_test_utl_finalize(1);                
+    oc_bpt_test_utl_finalize(1);
     for (i=0; i<param->max_int; i++) {
         bool rc = TRUE;
-        
+
         oc_bpt_test_utl_btree_lookup(&wu, s_p, i, &rc);
         if (!rc)
             print_and_exit(s_p);
     }
-    
+
 
     for (i=0; i<10; i++) {
         bool rc = FALSE;
-        
+
         oc_bpt_test_utl_btree_lookup_range(
             &wu,
             s_p,
@@ -279,7 +278,7 @@ static void multi_threaded_test (void)
             oc_bpt_test_utl_random_number(param->max_int),
             &rc);
     }
-    
+
     // run random-threads
     if (oc_bpt_test_utl_random_number(3) == 0)
         small_tree = TRUE;
@@ -303,15 +302,15 @@ static void run_tests(void* dummy)
 {
     int j;
 
-    
+
     oc_bpt_dbg_output_init();
-    
+
     for (j=0; j<3; j++)
         multi_threaded_test ();
 
     // verify the free-space has no block allocated
     oc_bpt_test_utl_fs_verify(0);
-    
+
     printf("   // total_ops=%d\n", param->total_ops);
     oc_bpt_dbg_output_end();
 
@@ -320,19 +319,20 @@ static void run_tests(void* dummy)
 
 /******************************************************************/
 
-static void test_init_fun(void)
+static void* test_init_fun(void* dummy)
 {
     oc_bpt_test_utl_init();
     oc_bpt_test_utl_set_print_fun(display_tree);
     oc_bpt_test_utl_set_validate_fun(validate_tree);
     run_tests(NULL);
+    return NULL;
 }
 
 int main(int argc, char *argv[])
 {
     Oc_crt_config crt_conf;
-    
-    // initialize the tracing facility 
+
+    // initialize the tracing facility
     pl_trace_base_init();
 
     if (oc_bpt_test_utl_parse_cmd_line(argc, argv) == FALSE)
@@ -350,11 +350,11 @@ int main(int argc, char *argv[])
     oc_crt_default_config(&crt_conf);
     crt_conf.init_fun = test_init_fun;
 
-    // why do we need this? 
+    // why do we need this?
     param->num_tasks = 10;
 
     //  We need more pages for the lookup-range function
-    crt_conf.stack_page_size = 20;  
+    crt_conf.stack_page_size = 20;
     oc_crt_init_full(&crt_conf);
 
     // go to sleep forever
@@ -362,7 +362,6 @@ int main(int argc, char *argv[])
     //sem_wait(&sema);
     sleep(10000);
     return 0;
-}    
+}
 
 /******************************************************************/
-

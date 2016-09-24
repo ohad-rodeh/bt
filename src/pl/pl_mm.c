@@ -2,16 +2,16 @@
 /*
  * Copyright (c) 2014-2015, Ohad Rodeh, IBM Research
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met: 
- * 
+ * modification, are permitted provided that the following conditions are met:
+ *
  * 1. Redistributions of source code must retain the above copyright notice, this
- *    list of conditions and the following disclaimer. 
+ *    list of conditions and the following disclaimer.
  * 2. Redistributions in binary form must reproduce the above copyright notice,
  *    this list of conditions and the following disclaimer in the documentation
- *    and/or other materials provided with the distribution. 
- * 
+ *    and/or other materials provided with the distribution.
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -22,11 +22,11 @@
  * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  * The views and conclusions contained in the software and documentation are those
- * of the authors and should not be interpreted as representing official policies, 
+ * of the authors and should not be interpreted as representing official policies,
  * either expressed or implied, of IBM Research.
- * 
+ *
  */
 /**************************************************************/
 /***************************************************************************/
@@ -50,7 +50,7 @@ void* pl_mm_malloc (int size)
 {
     void *ptr;
     ptr = malloc(size);
-    if (NULL == ptr) 
+    if (NULL == ptr)
        ERR(("out of memory"));
 
     return ptr;
@@ -79,7 +79,7 @@ typedef struct Pl_mm_op_s {
 } Pl_mm_op_s;
 
 /* Align [size] by [align].
- * 
+ *
  * For example,
  *   Aligning 7 by align=2 should result in 8.
  *   Aligning 13 by align=4 should result in 16.
@@ -88,7 +88,7 @@ typedef struct Pl_mm_op_s {
 static int align (int size, Pl_mm_alignment_t align)
 {
     if (1 == align) return size;
-    
+
     return ((size+align)/align) * align;
 }
 
@@ -110,16 +110,18 @@ bool pl_mm_pool_create( uint32 size_i,
     uint32 i;
     char *obj;
     int aligned_size;
-    
+
     if (size_i < sizeof(int))
         ERR(("can't create a memory pool for objects smaller than an integer"));
-        
+    if (size_i < sizeof(void*))
+        ERR(("can't create a memory pool for objects smaller than a pointer"));
+
     new_pool = (Pl_mm_op*) pl_mm_malloc(sizeof(Pl_mm_op_s));
 
     memset(new_pool, 0, sizeof(Pl_mm_op_s));
     new_pool->size = size_i;
     new_pool->number = number_i;
-    new_pool->all_objects_pp = 
+    new_pool->all_objects_pp =
         (void**) pl_mm_malloc( sizeof(void*) * number_i );
     memset( new_pool->all_objects_pp, 0, sizeof(void*) * number_i );
     *pool_o = new_pool;
@@ -131,7 +133,7 @@ bool pl_mm_pool_create( uint32 size_i,
 	memset(obj, 0, aligned_size);
         new_pool->all_objects_pp[i] = (void*)obj;
 
-	if (NULL != init_object_i) 
+	if (NULL != init_object_i)
 	    (*init_object_i)(obj);
 	ssslist_add_tail(&new_pool->free_list, (Ss_slist_node*)obj);
     }
@@ -145,7 +147,7 @@ void pl_mm_pool_delete( Pl_mm_op *pool_p,
 {
     int i;
     char *obj;
-    
+
     assert(pool_p);
     assert(pool_p->all_objects_pp);
     for (i=0;i<pool_p->number;i++) {
@@ -156,7 +158,7 @@ void pl_mm_pool_delete( Pl_mm_op *pool_p,
         if (destroy_object_fun) {
             destroy_object_fun(obj);
         }
-        
+
         pl_mm_free(obj);
         pool_p->all_objects_pp[i]=NULL;
     }
@@ -169,7 +171,7 @@ bool pl_mm_pool_alloc( Pl_mm_op *pool_i,
                        void **object_o )
 {
     bool rc = FALSE;
-    
+
     if (ssslist_get_length(&pool_i->free_list) > 0) {
 	*object_o = (void*) ssslist_remove_head(&pool_i->free_list);
 	rc = TRUE;
@@ -187,4 +189,3 @@ void pl_mm_pool_free( Pl_mm_op *pool_i, void *object_i )
 }
 
 /***************************************************************************/
-

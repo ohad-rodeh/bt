@@ -2,16 +2,16 @@
 /*
  * Copyright (c) 2014-2015, Ohad Rodeh, IBM Research
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met: 
- * 
+ * modification, are permitted provided that the following conditions are met:
+ *
  * 1. Redistributions of source code must retain the above copyright notice, this
- *    list of conditions and the following disclaimer. 
+ *    list of conditions and the following disclaimer.
  * 2. Redistributions in binary form must reproduce the above copyright notice,
  *    this list of conditions and the following disclaimer in the documentation
- *    and/or other materials provided with the distribution. 
- * 
+ *    and/or other materials provided with the distribution.
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -22,11 +22,11 @@
  * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  * The views and conclusions contained in the software and documentation are those
- * of the authors and should not be interpreted as representing official policies, 
+ * of the authors and should not be interpreted as representing official policies,
  * either expressed or implied, of IBM Research.
- * 
+ *
  */
 /**************************************************************/
 /******************************************************************/
@@ -109,8 +109,8 @@ bool oc_crt_lock_check(Oc_crt_rw_lock * lock_p)
 
 void oc_crt_init_full(Oc_crt_config * config_p)
 {
-    int id;
-    
+    pthread_t id;
+
     config = *config_p;
 
     printf("sizeof(oc_crt_rwlock) = %ld\n", sizeof(Oc_crt_rw_lock));
@@ -120,11 +120,12 @@ void oc_crt_init_full(Oc_crt_config * config_p)
 
     oc_utl_assert(sizeof(Oc_crt_rw_lock) >= sizeof(pthread_rwlock_t));
     oc_utl_assert(sizeof(Oc_crt_sema) >= sizeof(sem_t));
-    
-    if (pthread_create((pthread_t*)&id,
-                       NULL,
-                       (void *(*)(void *))config.init_fun, NULL) != 0)
+
+    pthread_attr_t attr;
+    pthread_attr_init(&attr);
+    if (pthread_create(&id, &attr, config_p->init_fun, NULL) != 0)
         ERR(("could not open main thread"));
+    pthread_attr_destroy(&attr);
 }
 
 void oc_crt_default_config(Oc_crt_config *config_p)
@@ -155,7 +156,7 @@ int oc_crt_get_thread(void)
 void oc_crt_sema_init(Oc_crt_sema * sema_p, int value)
 {
     int ern;
-    
+
     ern = sem_init(&sema_p->sem, 0, value);
     if (ern) {
         ERR(("sem_init: (%d) %s", ern, strerror(ern))) ;
@@ -182,7 +183,7 @@ void oc_crt_sema_wait(Oc_crt_sema * sema_p)
     }
 }
 
-int oc_crt_create_task(const char * name_p, 
+int oc_crt_create_task(const char * name_p,
                         void *(*start_routine) (void *),
                         void * arg_p)
 {
