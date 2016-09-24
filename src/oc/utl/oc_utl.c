@@ -2,16 +2,16 @@
 /*
  * Copyright (c) 2014-2015, Ohad Rodeh, IBM Research
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met: 
- * 
+ * modification, are permitted provided that the following conditions are met:
+ *
  * 1. Redistributions of source code must retain the above copyright notice, this
- *    list of conditions and the following disclaimer. 
+ *    list of conditions and the following disclaimer.
  * 2. Redistributions in binary form must reproduce the above copyright notice,
  *    this list of conditions and the following disclaimer in the documentation
- *    and/or other materials provided with the distribution. 
- * 
+ *    and/or other materials provided with the distribution.
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -22,11 +22,11 @@
  * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  * The views and conclusions contained in the software and documentation are those
- * of the authors and should not be interpreted as representing official policies, 
+ * of the authors and should not be interpreted as representing official policies,
  * either expressed or implied, of IBM Research.
- * 
+ *
  */
 /**************************************************************/
 /******************************************************************/
@@ -46,7 +46,7 @@
 Oc_utl_config oc_utl_conf_g;
 
 /******************************************************************/
-    
+
 /** Update a 32-bit Linear Redundancy Check */
 
 uint32 oc_utl_lrc_update(uint32 lrc, char * buf, int len)
@@ -60,12 +60,12 @@ uint32 oc_utl_lrc_update(uint32 lrc, char * buf, int len)
 
     /* must be multiple of 32 bits */
     //oc_utl_assert((len & 3) == 0);
-    
+
     p = (uint32 *) buf;
     for (n = 0; n < len / 4; n++) {
         lrc ^= *p++;
     }
-    
+
     // Handle non aligned end
     non_align_len = len%4;
     if (non_align_len > 0) {
@@ -106,7 +106,7 @@ const char *oc_utl_string_of_subcomponent_id(Oc_subcomponent_id id)
 }
 
 #undef CASE
- 
+
 /**************************************************************/
 
 
@@ -119,9 +119,9 @@ void oc_utl_init_full(Oc_utl_config *conf_pi)
     printf("   lun size: %Lu(Mbyte), or, %Lu(Kbyte)\n",
            oc_utl_conf_g.lun_size /(1024 * 1024),
            oc_utl_conf_g.lun_size / 1024);
-    printf("   OSD version: %lu\n", (uint32)oc_utl_conf_g.version);    
-    printf("   data dev: %s\n", oc_utl_conf_g.data_dev);    
-    printf("   ljl dev: %s\n", oc_utl_conf_g.ljl_dev);    
+    printf("   OSD version: %lu\n", (uint32)oc_utl_conf_g.version);
+    printf("   data dev: %s\n", oc_utl_conf_g.data_dev);
+    printf("   ljl dev: %s\n", oc_utl_conf_g.ljl_dev);
     printf("====================\n");
 }
 
@@ -129,7 +129,7 @@ void oc_utl_default_config(Oc_utl_config *conf_po)
 {
     memset(conf_po, 0, sizeof(Oc_utl_config));
     conf_po->lun_size = OC_LUN_SIZE;
-        
+
     memset(conf_po->data_dev, 0, 60);
     memset(conf_po->ljl_dev, 0, 60);
 }
@@ -156,12 +156,12 @@ uint64 oc_query_input_lun_size( uint32 lun )
 
 /**************************************************************/
 
-uint64 oc_utl_get_req_id(void)
+/*uint64 oc_utl_get_req_id(void)
 {
     static uint64 req_id = 1;
     req_id++;
     return req_id;
-}
+    }*/
 
 /**************************************************************/
 
@@ -170,7 +170,7 @@ uint32 oc_utl_log2(uint32 num)
     int i;
 
     if (0 == num || 1 == num) return 0;
-    
+
     for (i=1; i<32; i++) {
         num = num>>1;
         if (0 == num) return (i-1);
@@ -181,5 +181,3 @@ uint32 oc_utl_log2(uint32 num)
 
 /**************************************************************/
 // statistics
-
-

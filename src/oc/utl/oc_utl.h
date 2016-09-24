@@ -2,16 +2,16 @@
 /*
  * Copyright (c) 2014-2015, Ohad Rodeh, IBM Research
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met: 
- * 
+ * modification, are permitted provided that the following conditions are met:
+ *
  * 1. Redistributions of source code must retain the above copyright notice, this
- *    list of conditions and the following disclaimer. 
+ *    list of conditions and the following disclaimer.
  * 2. Redistributions in binary form must reproduce the above copyright notice,
  *    this list of conditions and the following disclaimer in the documentation
- *    and/or other materials provided with the distribution. 
- * 
+ *    and/or other materials provided with the distribution.
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -22,11 +22,11 @@
  * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  * The views and conclusions contained in the software and documentation are those
- * of the authors and should not be interpreted as representing official policies, 
+ * of the authors and should not be interpreted as representing official policies,
  * either expressed or implied, of IBM Research.
- * 
+ *
  */
 /**************************************************************/
 /******************************************************************/
@@ -49,12 +49,12 @@
 
 // The list of OC subcomponents
 typedef enum {
-    // Utility, making sure nobody uses component zero by mistake    
-    OC_MIN_COMP = 0, 
+    // Utility, making sure nobody uses component zero by mistake
+    OC_MIN_COMP = 0,
 
-    OC_CRT,     // Co-routines. 
+    OC_CRT,     // Co-routines.
     OC_IO,      // The IO client
-    OC_FS,      // The free-space 
+    OC_FS,      // The free-space
     OC_BT,      // The b-tree
     OC_SN,      // The s-node
     OC_CAT,     // The catalog
@@ -82,7 +82,7 @@ extern Oc_utl_config oc_utl_conf_g;
 
 typedef enum Oc_atomic {
     OC_ATOMIC = 1,
-    OC_NON_ATOMIC, 
+    OC_NON_ATOMIC,
 } Oc_atomic;
 
 typedef void*(*thread_routine_t)(void*);
@@ -127,7 +127,7 @@ const char *oc_utl_string_of_subcomponent_id(Oc_subcomponent_id id);
 
 uint64 oc_query_input_lun_size(uint32 lun);
 
-uint64 oc_utl_get_req_id(void);
+//uint64 oc_utl_get_req_id(void);
 
 /******************************************************************/
 
