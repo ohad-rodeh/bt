@@ -98,11 +98,8 @@ typedef struct Oc_bpt_test_state {
 // Lock to ensure operation atomicity of the infrastructure. This is
 // required for the testing harness, not for the core b-tree
 // algorithms. In a real file-system, the free space and memory management
-// will have their own way of providing atomicity
+// will have their own, highly concurrent, method of ensuring atomicity.
 static Oc_crt_rw_lock g_lock;
-
-// a simple validation test for ref-counts
-static int g_refcnt = 0;
 
 static void (*print_fun)(void) = NULL;
 static bool (*validate_fun)(void) = NULL;
@@ -224,8 +221,6 @@ static Oc_bpt_node* node_alloc(Oc_wu *wu_p)
 
     oc_crt_lock_write(&g_lock);
     {
-        // simple checking for ref-counts
-        g_refcnt++;
         tnode_p->node.data = (char*) wrap_malloc(NODE_SIZE);
         tnode_p->node.disk_addr = oc_bpt_test_fs_alloc();
         tnode_p->magic = MAGIC;
@@ -292,9 +287,8 @@ static Oc_bpt_node* node_get(Oc_wu *wu_p, uint64 addr)
         if (oc_bpt_test_utl_random_number(2) == 0)
             oc_crt_yield_task();
 
-    oc_crt_lock_write(&g_lock);
+    oc_crt_lock_read(&g_lock);
     {
-        g_refcnt++;
         tnode_p = vd_node_lookup(addr);
         if (NULL == tnode_p) {
             printf("error, did not find a b-tree node at address=%Lu po=%lu\n",
@@ -345,13 +339,6 @@ static Oc_bpt_node* node_get_xl(Oc_wu *wu_p, uint64 addr)
 static void node_release(Oc_wu *wu_p, Oc_bpt_node *node_p)
 {
     oc_utl_trk_crt_unlock(wu_p, &node_p->lock);
-
-    oc_crt_lock_write(&g_lock);
-    {
-        g_refcnt--;
-        oc_utl_assert(g_refcnt>=0);
-    }
-    oc_crt_unlock(&g_lock);
 }
 
 static Oc_bpt_test_node *tnode_clone(Oc_bpt_test_node *tnode_p)
@@ -474,11 +461,7 @@ static void data_to_string(struct Oc_bpt_data *data_p, char *str_p, int max_len)
 
 void oc_bpt_test_utl_finalize(int refcnt)
 {
-    if (refcnt != g_refcnt) {
-        fprintf(stderr, "refcnt=%d  g_refcnt=%d\n", refcnt, g_refcnt);
-    }
-
-    oc_utl_assert(refcnt == g_refcnt);
+    // TODO: check that all node ref-counts are zero.
 }
 
 
@@ -523,7 +506,12 @@ void oc_bpt_test_utl_btree_create(
     Oc_bpt_test_state *s_p)
 {
     oc_bpt_create_b(wu_p, &s_p->bpt_s);
-    oc_bpt_alt_create_b(wu_p, &s_p->alt_s);
+
+    oc_crt_lock_write(&g_lock);
+    {
+        oc_bpt_alt_create_b(wu_p, &s_p->alt_s);
+    }
+    oc_crt_unlock(&g_lock);
 }
 
 void oc_bpt_test_utl_btree_display(
@@ -564,7 +552,6 @@ bool oc_bpt_test_utl_btree_validate(
 
     rc1 = oc_bpt_dbg_validate_b(&utl_wu, &s_p->bpt_s);
     rc2 = oc_bpt_alt_dbg_validate_b(&utl_wu, &s_p->alt_s);
-
 
     if (!rc1)
         printf("    // invalid b-tree\n");
@@ -610,10 +597,14 @@ void oc_bpt_test_utl_btree_insert(
                               &s_p->bpt_s,
                               (struct Oc_bpt_key*) &key,
                               (struct Oc_bpt_data*) &key);
-    rc2 = oc_bpt_alt_insert_key_b(wu_p,
-                                  &s_p->alt_s,
-                                  (struct Oc_bpt_key*) &key,
-                                  (struct Oc_bpt_data*) &key);
+    oc_crt_lock_write(&g_lock);
+    {
+        rc2 = oc_bpt_alt_insert_key_b(wu_p,
+                                      &s_p->alt_s,
+                                      (struct Oc_bpt_key*) &key,
+                                      (struct Oc_bpt_data*) &key);
+    }
+    oc_crt_unlock(&g_lock);
 
     if (*check_eq_pio) {
         if (rc1 != rc2) {
@@ -647,11 +638,15 @@ void oc_bpt_test_utl_btree_lookup_internal(
         (struct Oc_bpt_key*) &key,
         (struct Oc_bpt_data*) &data1);
 
-    rc2 = oc_bpt_alt_lookup_key_b(
-        wu_p,
-        &s_p->alt_s,
-        (struct Oc_bpt_key*) &key,
-        (struct Oc_bpt_data*) &data2);
+    oc_crt_lock_read(&g_lock);
+    {
+        rc2 = oc_bpt_alt_lookup_key_b(
+            wu_p,
+            &s_p->alt_s,
+            (struct Oc_bpt_key*) &key,
+            (struct Oc_bpt_data*) &data2);
+    }
+    oc_crt_unlock(&g_lock);
 
     if (*check_eq_pio) {
         if (rc1 != rc2 ||
@@ -694,10 +689,14 @@ void oc_bpt_test_utl_btree_remove_key(
         &s_p->bpt_s,
         (struct Oc_bpt_key *)&key);
 
-    rc2 = oc_bpt_alt_remove_key_b(
-        wu_p,
-        &s_p->alt_s,
-        (struct Oc_bpt_key *)&key);
+    oc_crt_lock_write(&g_lock);
+    {
+        rc2 = oc_bpt_alt_remove_key_b(
+            wu_p,
+            &s_p->alt_s,
+            (struct Oc_bpt_key *)&key);
+    }
+    oc_crt_unlock(&g_lock);
 
     if (*check_eq_pio) {
         if (rc1 != rc2) {
@@ -718,7 +717,11 @@ void oc_bpt_test_utl_btree_delete(
 {
     if (param->verbose) printf("// btree delete\n");
     oc_bpt_delete_b(wu_p, &s_p->bpt_s);
-    oc_bpt_alt_delete_b(wu_p, &s_p->alt_s);
+    oc_crt_lock_write(&g_lock);
+    {
+        oc_bpt_alt_delete_b(wu_p, &s_p->alt_s);
+    }
+    oc_crt_unlock(&g_lock);
 
     if (param->verbose) print_fun();
 }
@@ -772,14 +775,19 @@ void oc_bpt_test_utl_btree_lookup_range(
 
     if (! (*check_eq_pio)) return;
 
-    oc_bpt_alt_lookup_range_b(
-        wu_p, &s_p->alt_s,
-        (struct Oc_bpt_key*)&lo_key,
-        (struct Oc_bpt_key*)&hi_key,
-        n_keys,
-        (struct Oc_bpt_key*)key_array2,
-        (struct Oc_bpt_data*)data_array2,
-        &nkeys_found2);
+    oc_crt_lock_read(&g_lock);
+    {
+        oc_bpt_alt_lookup_range_b(
+            wu_p, &s_p->alt_s,
+            (struct Oc_bpt_key*)&lo_key,
+            (struct Oc_bpt_key*)&hi_key,
+            n_keys,
+            (struct Oc_bpt_key*)key_array2,
+            (struct Oc_bpt_data*)data_array2,
+            &nkeys_found2);
+    }
+    oc_crt_unlock(&g_lock);
+
 
     if (nkeys_found2 != nkeys_found1)
         goto error;
@@ -849,9 +857,13 @@ void oc_bpt_test_utl_btree_insert_range(
     rc1 = oc_bpt_insert_range_b(wu_p, &s_p->bpt_s, len,
                                 (struct Oc_bpt_key*)key_array,
                                 (struct Oc_bpt_data*)data_array);
-    rc2 = oc_bpt_alt_insert_range_b(wu_p, &s_p->alt_s, len,
-                                    (struct Oc_bpt_key*)key_array,
-                                    (struct Oc_bpt_data*)data_array);
+    oc_crt_lock_write(&g_lock);
+    {
+        rc2 = oc_bpt_alt_insert_range_b(wu_p, &s_p->alt_s, len,
+                                        (struct Oc_bpt_key*)key_array,
+                                        (struct Oc_bpt_data*)data_array);
+    }
+    oc_crt_unlock(&g_lock);
 
     if (*check_eq_pio) {
         if (!validate_fun())
@@ -882,9 +894,13 @@ void oc_bpt_test_utl_btree_remove_range(
     rc1 = oc_bpt_remove_range_b(wu_p, &s_p->bpt_s,
                                 (struct Oc_bpt_key*)&lo_key,
                                 (struct Oc_bpt_key*)&hi_key);
-    rc2 = oc_bpt_alt_remove_range_b(wu_p, &s_p->alt_s,
-                                    (struct Oc_bpt_key*)&lo_key,
-                                    (struct Oc_bpt_key*)&hi_key);
+    oc_crt_lock_write(&g_lock);
+    {
+        rc2 = oc_bpt_alt_remove_range_b(wu_p, &s_p->alt_s,
+                                        (struct Oc_bpt_key*)&lo_key,
+                                        (struct Oc_bpt_key*)&hi_key);
+    }
+    oc_crt_unlock(&g_lock);
 
     if (*check_eq_pio) {
         if (!validate_fun())
@@ -934,7 +950,11 @@ void oc_bpt_test_utl_btree_clone(
     if (param->verbose) printf("// clone new-TID=%Lu\n", get_tid(trg_p));
 
     oc_bpt_clone_b(wu_p, &src_p->bpt_s, &trg_p->bpt_s);
-    oc_bpt_alt_clone_b(wu_p, &src_p->alt_s, &trg_p->alt_s);
+    oc_crt_lock_write(&g_lock);
+    {
+        oc_bpt_alt_clone_b(wu_p, &src_p->alt_s, &trg_p->alt_s);
+    }
+    oc_crt_unlock(&g_lock);
 
     if (param->verbose) print_fun();
 }
