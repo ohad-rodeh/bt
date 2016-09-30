@@ -6,4 +6,4 @@ script:
   - make --version
   - gcc --version
   # Build and run unit tests
-  - make all && ./unit_tests.sh
+  - touch src/.depend && make all && ./unit_tests.sh
