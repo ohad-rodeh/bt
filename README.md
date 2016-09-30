@@ -12,7 +12,7 @@ src/oc/bpt. BPT is short for "B Plus Tree". The license is BSD, which
 should allow incorporating the code into other open source and commercial projects.
 
 ### Build & run tests
-
+<a href="https://travis-ci.org/orodeh/bt"><img src="https://travis-ci.org/orodeh/bt.svg?branch=master"/></a>
 The project depends on standard Linux tools: `gcc`, `make`, `awk`, `sed`.
 
 In order to compile the project, from the root directory `ROOT`, do:
