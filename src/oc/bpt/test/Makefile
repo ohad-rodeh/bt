@@ -2,16 +2,16 @@
 #
 # Copyright (c) 2014-2015, Ohad Rodeh, IBM Research
 # All rights reserved.
-# 
+#
 # Redistribution and use in source and binary forms, with or without
-# modification, are permitted provided that the following conditions are met: 
-# 
+# modification, are permitted provided that the following conditions are met:
+#
 # 1. Redistributions of source code must retain the above copyright notice, this
-#    list of conditions and the following disclaimer. 
+#    list of conditions and the following disclaimer.
 # 2. Redistributions in binary form must reproduce the above copyright notice,
 #    this list of conditions and the following disclaimer in the documentation
-#    and/or other materials provided with the distribution. 
-# 
+#    and/or other materials provided with the distribution.
+#
 # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 # ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 # WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -22,9 +22,9 @@
 # ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-# 
+#
 # The views and conclusions contained in the software and documentation are those
-# of the authors and should not be interpreted as representing official policies, 
+# of the authors and should not be interpreted as representing official policies,
 # either expressed or implied, of IBM Research.
 #
 #*************************************************************#
@@ -46,7 +46,7 @@ include $(OC)/bpt/files.mk
 
 #*************************************************************#
 
-SUBDIRS =  crt ds utl bpt 
+SUBDIRS =  crt ds utl bpt
 
 CFLAGS += $(SUBDIRS:%=-I $(OCROOT)/%)
 
@@ -60,8 +60,7 @@ OBJ = \
 	${UTL_OBJECTS} \
 	${BPT_OBJECTS} \
 	${OBJDIR}/oc_bpt_test_fs.o \
-	${OBJDIR}/oc_bpt_alt.o \
-	${OBJDIR}/oc_bpt_test_utl.o
+	${OBJDIR}/oc_bpt_alt.o
 
 all :  \
        $(BINDIR)/oc_bpt_test_st \
@@ -70,37 +69,43 @@ all :  \
 
 
 $(BINDIR)/oc_bpt_test_st : ${OBJ} \
-			   ${OBJDIR}/oc_bpt_test_st.o 
+			   ${OBJDIR}/oc_bpt_test_st.o \
+		           ${OBJDIR}/oc_bpt_test_utl_st.o
 	$(GENEXE) -o $(BINDIR)/oc_bpt_test_st \
 	      ${OBJDIR}/oc_bpt_test_st.o \
+	      ${OBJDIR}/oc_bpt_test_utl_st.o \
 	      $(OBJ) \
 	   -L$(OSDROOT)/lib -lpl -lpthread
 
 $(BINDIR)/oc_bpt_test_mt : ${OBJ} \
-			   ${OBJDIR}/oc_bpt_test_mt.o 
+			   ${OBJDIR}/oc_bpt_test_mt.o \
+		           ${OBJDIR}/oc_bpt_test_utl_mt.o
 	$(GENEXE) -o $(BINDIR)/oc_bpt_test_mt \
 	      ${OBJDIR}/oc_bpt_test_mt.o \
+	      ${OBJDIR}/oc_bpt_test_utl_mt.o \
 	      $(OBJ) \
 	   -L$(OSDROOT)/lib -lpl -lpthread
 
 $(BINDIR)/oc_bpt_test_clone_st : ${OBJ} \
 			         ${OBJDIR}/oc_bpt_test_clone_st.o \
-			         ${OBJDIR}/oc_bpt_test_clone.o
+			         ${OBJDIR}/oc_bpt_test_clone.o \
+			         ${OBJDIR}/oc_bpt_test_utl_st.o
 	$(GENEXE) -o $(BINDIR)/oc_bpt_test_clone_st \
 	      ${OBJDIR}/oc_bpt_test_clone_st.o \
               ${OBJDIR}/oc_bpt_test_clone.o \
+	      ${OBJDIR}/oc_bpt_test_utl_st.o \
 	      $(OBJ) \
 	   -L$(OSDROOT)/lib -lpl -lpthread
 
 jpg :
 	dot -Tjpg X.dot -o X.jpg
 
-clean : 
+clean :
 	$(RM) ${OBJDIR}/oc_bpt_*.o
 	$(RM) ${BINDIR}/oc_bpt_*
 	$(RM) *.o
 
-realclean : clean 
+realclean : clean
 
 bpt_test: all
 
