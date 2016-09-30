@@ -13,6 +13,7 @@ should allow incorporating the code into other open source and commercial projec
 
 ### Build & run tests
 <a href="https://travis-ci.org/orodeh/bt"><img src="https://travis-ci.org/orodeh/bt.svg?branch=master"/></a>
+
 The project depends on standard Linux tools: `gcc`, `make`, `awk`, `sed`.
 
 In order to compile the project, from the root directory `ROOT`, do:
@@ -22,9 +23,8 @@ make all
 ```
 
 This will create three directories under `bin`, `lib`, and `obj`. They
-contain generated binaries, libraries, and object files.
-
-The sources for the b-tree tests are in directory `src/oc/bpt/test`. The test
+contain generated binaries, libraries, and object files. The sources
+for the b-tree tests are in directory `src/oc/bpt/test`. The test
 script that exercises all the tests is `run_tests.sh`.
 
 
