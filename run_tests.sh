@@ -4,7 +4,7 @@
 # Read command line parameters into -flags-
 extra_flags=$*
 
-ocroot=../../../..
+ocroot=.
 oc_bpt_test_st=$ocroot/bin/oc_bpt_test_st
 oc_bpt_test_mt=$ocroot/bin/oc_bpt_test_mt
 oc_bpt_test_clone_st=$ocroot/bin/oc_bpt_test_clone_st
@@ -169,7 +169,5 @@ if [[ $multi_threaded_tests == "yes"  ]]
       done
     done
 fi
-    
-#-----------------------------------------------------------------
-    
 
+#-----------------------------------------------------------------

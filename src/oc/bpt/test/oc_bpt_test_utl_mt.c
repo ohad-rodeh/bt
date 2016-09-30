@@ -46,7 +46,6 @@
 #include "oc_utl_trk.h"
 #include "oc_bpt_int.h"
 #include "oc_bpt_nd.h"
-#include "oc_bpt_alt.h"
 #include "oc_bpt_test_utl.h"
 #include "oc_bpt_test_fs.h"
 
@@ -55,7 +54,6 @@
 #define MAGIC (2718)
 
 static Oc_bpt_cfg cfg;
-static Oc_bpt_alt_cfg alt_cfg;
 
 // set default values
 static Oc_bpt_test_param param_global = {
@@ -92,7 +90,6 @@ typedef struct Oc_bpt_test_node {
 // A structure that encapsulates both implementations of a b-tree
 typedef struct Oc_bpt_test_state {
     Oc_bpt_state bpt_s;
-    Oc_bpt_alt_state alt_s;
 } Oc_bpt_test_state;
 
 // Lock to ensure operation atomicity of the infrastructure. This is
@@ -490,7 +487,6 @@ Oc_bpt_test_state *oc_bpt_test_utl_btree_init(struct Oc_wu *wu_p, uint64 tid)
     s_p = (Oc_bpt_test_state *) wrap_malloc(sizeof(Oc_bpt_test_state));
 
     oc_bpt_init_state_b(NULL, &s_p->bpt_s, &cfg, tid);
-    oc_bpt_alt_init_state_b(NULL, &s_p->alt_s, &alt_cfg);
 
     return s_p;
 }
@@ -506,12 +502,6 @@ void oc_bpt_test_utl_btree_create(
     Oc_bpt_test_state *s_p)
 {
     oc_bpt_create_b(wu_p, &s_p->bpt_s);
-
-    oc_crt_lock_write(&g_lock);
-    {
-        oc_bpt_alt_create_b(wu_p, &s_p->alt_s);
-    }
-    oc_crt_unlock(&g_lock);
 }
 
 void oc_bpt_test_utl_btree_display(
@@ -523,40 +513,17 @@ void oc_bpt_test_utl_btree_display(
 
     cnt++;
     sprintf(tag, "Tree_%d", cnt);
-
-    switch (choice)
-    {
-    case OC_BPT_TEST_UTL_TREE_ONLY:
-        oc_bpt_dbg_output_b(&utl_wu, &s_p->bpt_s, tag);
-        break;
-
-    case OC_BPT_TEST_UTL_LL_ONLY:
-        printf("// Linked-list:\n");
-        oc_bpt_alt_dbg_output_b(&utl_wu, &s_p->alt_s);
-        break;
-
-    case OC_BPT_TEST_UTL_BOTH:
-        oc_bpt_dbg_output_b(&utl_wu, &s_p->bpt_s, tag);
-        printf("// Linked-list:\n");
-        oc_bpt_alt_dbg_output_b(&utl_wu, &s_p->alt_s);
-        break;
-    }
-
+    oc_bpt_dbg_output_b(&utl_wu, &s_p->bpt_s, tag);
     fflush(stdout);
 }
 
 bool oc_bpt_test_utl_btree_validate(
     Oc_bpt_test_state *s_p)
 {
-    bool rc1, rc2;
-
-    rc1 = oc_bpt_dbg_validate_b(&utl_wu, &s_p->bpt_s);
-    rc2 = oc_bpt_alt_dbg_validate_b(&utl_wu, &s_p->alt_s);
-
-    if (!rc1)
+    bool rc = oc_bpt_dbg_validate_b(&utl_wu, &s_p->bpt_s);
+    if (!rc)
         printf("    // invalid b-tree\n");
-
-    return rc1 && rc2;
+    return rc;
 }
 
 // validate an array of clones
@@ -587,35 +554,12 @@ void oc_bpt_test_utl_btree_insert(
     uint32 key,
     bool *check_eq_pio)
 {
-    bool rc1, rc2;
-
     param->total_ops++;
-
     if (param->verbose) printf("// insert %lu TID=%Lu\n", key, get_tid(s_p));
-
-    rc1 = oc_bpt_insert_key_b(wu_p,
-                              &s_p->bpt_s,
-                              (struct Oc_bpt_key*) &key,
-                              (struct Oc_bpt_data*) &key);
-    oc_crt_lock_write(&g_lock);
-    {
-        rc2 = oc_bpt_alt_insert_key_b(wu_p,
-                                      &s_p->alt_s,
-                                      (struct Oc_bpt_key*) &key,
-                                      (struct Oc_bpt_data*) &key);
-    }
-    oc_crt_unlock(&g_lock);
-
-    if (*check_eq_pio) {
-        if (rc1 != rc2) {
-            printf("  // mismatch in insert (%lu)\n", key);
-            *check_eq_pio = FALSE;
-        }
-        if (!validate_fun()) {
-            *check_eq_pio = FALSE;
-        }
-    }
-
+    oc_bpt_insert_key_b(wu_p,
+                        &s_p->bpt_s,
+                        (struct Oc_bpt_key*) &key,
+                        (struct Oc_bpt_data*) &key);
     if (param->verbose && (*check_eq_pio))
         print_fun();
 }
@@ -626,36 +570,14 @@ void oc_bpt_test_utl_btree_lookup_internal(
     uint32 key,
     bool *check_eq_pio)
 {
-    uint32 data1,data2;
-    bool rc1, rc2;
+    uint32 data1;
 
-    rc1 = rc2 = FALSE;
-    data1 = data2 = 0;
-
-    rc1 = oc_bpt_lookup_key_b(
+    data1 = 0;
+    oc_bpt_lookup_key_b(
         wu_p,
         &s_p->bpt_s,
         (struct Oc_bpt_key*) &key,
         (struct Oc_bpt_data*) &data1);
-
-    oc_crt_lock_read(&g_lock);
-    {
-        rc2 = oc_bpt_alt_lookup_key_b(
-            wu_p,
-            &s_p->alt_s,
-            (struct Oc_bpt_key*) &key,
-            (struct Oc_bpt_data*) &data2);
-    }
-    oc_crt_unlock(&g_lock);
-
-    if (*check_eq_pio) {
-        if (rc1 != rc2 ||
-            data1 != data2) {
-            oc_bpt_test_utl_btree_display(s_p, OC_BPT_TEST_UTL_LL_ONLY);
-            printf("  // mismatch in lookup (%lu)\n", key);
-            *check_eq_pio = FALSE;
-        }
-    }
 }
 
 void oc_bpt_test_utl_btree_lookup(
@@ -679,8 +601,7 @@ void oc_bpt_test_utl_btree_remove_key(
     uint32 key,
     bool *check_eq_pio)
 {
-    bool rc1, rc2;
-
+    bool rc1;
     param->total_ops++;
 
     if (param->verbose) printf("// remove %lu TID=%Lu\n", key, get_tid(s_p));
@@ -688,23 +609,6 @@ void oc_bpt_test_utl_btree_remove_key(
         wu_p,
         &s_p->bpt_s,
         (struct Oc_bpt_key *)&key);
-
-    oc_crt_lock_write(&g_lock);
-    {
-        rc2 = oc_bpt_alt_remove_key_b(
-            wu_p,
-            &s_p->alt_s,
-            (struct Oc_bpt_key *)&key);
-    }
-    oc_crt_unlock(&g_lock);
-
-    if (*check_eq_pio) {
-        if (rc1 != rc2) {
-            printf("  // mismatch in remove_key(%lu)\n", key);
-        }
-        if (!validate_fun())
-            *check_eq_pio = FALSE;
-    }
 
     // print only if a key has actually been removed
     if (param->verbose && (*check_eq_pio) && rc1)
@@ -717,12 +621,6 @@ void oc_bpt_test_utl_btree_delete(
 {
     if (param->verbose) printf("// btree delete\n");
     oc_bpt_delete_b(wu_p, &s_p->bpt_s);
-    oc_crt_lock_write(&g_lock);
-    {
-        oc_bpt_alt_delete_b(wu_p, &s_p->alt_s);
-    }
-    oc_crt_unlock(&g_lock);
-
     if (param->verbose) print_fun();
 }
 
@@ -740,11 +638,9 @@ void oc_bpt_test_utl_btree_lookup_range(
     uint32 hi_key,
     bool *check_eq_pio)
 {
-    int i,j;
-    int nkeys_found1, nkeys_found2;
-    uint32 *key_array1, *key_array2, *data_array1, *data_array2;
+    int nkeys_found1;
+    uint32 *key_array1, *data_array1;
     int n_keys;
-
     param->total_ops++;
     if (param->verbose)
         printf("// lookup_range [lo_key=%lu, hi_key=%lu] TID=%Lu\n",
@@ -760,9 +656,7 @@ void oc_bpt_test_utl_btree_lookup_range(
 
     // We allocate these arrrays on the stack to get thread-safety
     key_array1 = (uint32*) alloca(n_keys * sizeof(uint32));
-    key_array2 = (uint32*) alloca(n_keys * sizeof(uint32));
     data_array1 = (uint32*) alloca(n_keys * sizeof(uint32));
-    data_array2 = (uint32*) alloca(n_keys * sizeof(uint32));
 
     oc_bpt_lookup_range_b(
         wu_p, &s_p->bpt_s,
@@ -772,61 +666,7 @@ void oc_bpt_test_utl_btree_lookup_range(
         (struct Oc_bpt_key*)key_array1,
         (struct Oc_bpt_data*)data_array1,
         &nkeys_found1);
-
-    if (! (*check_eq_pio)) return;
-
-    oc_crt_lock_read(&g_lock);
-    {
-        oc_bpt_alt_lookup_range_b(
-            wu_p, &s_p->alt_s,
-            (struct Oc_bpt_key*)&lo_key,
-            (struct Oc_bpt_key*)&hi_key,
-            n_keys,
-            (struct Oc_bpt_key*)key_array2,
-            (struct Oc_bpt_data*)data_array2,
-            &nkeys_found2);
-    }
-    oc_crt_unlock(&g_lock);
-
-
-    if (nkeys_found2 != nkeys_found1)
-        goto error;
-
-    for (i=0; i<nkeys_found1; i++)
-        if (key_array1[i] != key_array2[i] ||
-            data_array1[i] != data_array2[i]) {
-            goto error;
-        }
-
     return;
-
- error:
-
-    for (j=0; j<nkeys_found1; j++)
-        printf("  // bpt] (key=%lu data=%lu)\n",
-               key_array1[j],
-               data_array1[j]);
-    for (j=0; j<nkeys_found2; j++)
-        printf("  // alt] (key=%lu data=%lu)\n",
-               key_array2[j],
-               data_array2[j]);
-    printf("  // #entries found btree = %d\n", nkeys_found1);
-    printf("  // #entries found linked-list = %d\n", nkeys_found2);
-
-    for (i=0; i<nkeys_found1; i++) {
-        if (key_array1[i] != key_array2[i]) {
-            printf("// The error is in key number %d <KEY %lu != %lu>\n",
-                   i, key_array1[i], key_array2[i]);
-            break;
-        }
-        if (data_array1[i] != data_array2[i]) {
-            printf("// The error is in key number %d <DATA %lu != %lu>\n",
-                   i, data_array1[i], data_array2[i]);
-            break;
-        }
-    }
-
-    *check_eq_pio = FALSE;
 }
 
 void oc_bpt_test_utl_btree_insert_range(
@@ -835,7 +675,6 @@ void oc_bpt_test_utl_btree_insert_range(
     uint32 lo_key, uint32 len,
     bool *check_eq_pio)
 {
-    bool rc1, rc2;
     uint32 key_array[30];
     uint32 data_array[30];
     uint32 i;
@@ -854,27 +693,9 @@ void oc_bpt_test_utl_btree_insert_range(
         data_array[i] = lo_key+i;
     }
 
-    rc1 = oc_bpt_insert_range_b(wu_p, &s_p->bpt_s, len,
-                                (struct Oc_bpt_key*)key_array,
-                                (struct Oc_bpt_data*)data_array);
-    oc_crt_lock_write(&g_lock);
-    {
-        rc2 = oc_bpt_alt_insert_range_b(wu_p, &s_p->alt_s, len,
-                                        (struct Oc_bpt_key*)key_array,
-                                        (struct Oc_bpt_data*)data_array);
-    }
-    oc_crt_unlock(&g_lock);
-
-    if (*check_eq_pio) {
-        if (!validate_fun())
-            *check_eq_pio = FALSE;
-        if (rc1 != rc2) {
-            printf("  // mismatch in insert_range key=%lu len=%lu\n",
-                   lo_key, len);
-            *check_eq_pio = FALSE;
-        }
-    }
-
+    oc_bpt_insert_range_b(wu_p, &s_p->bpt_s, len,
+                          (struct Oc_bpt_key*)key_array,
+                          (struct Oc_bpt_data*)data_array);
     if (param->verbose && (*check_eq_pio))
         print_fun();
 }
@@ -885,7 +706,7 @@ void oc_bpt_test_utl_btree_remove_range(
     uint32 lo_key, uint32 hi_key,
     bool *check_eq_pio)
 {
-    int rc1, rc2;
+    int rc1;
 
     param->total_ops++;
     if (param->verbose)
@@ -894,24 +715,6 @@ void oc_bpt_test_utl_btree_remove_range(
     rc1 = oc_bpt_remove_range_b(wu_p, &s_p->bpt_s,
                                 (struct Oc_bpt_key*)&lo_key,
                                 (struct Oc_bpt_key*)&hi_key);
-    oc_crt_lock_write(&g_lock);
-    {
-        rc2 = oc_bpt_alt_remove_range_b(wu_p, &s_p->alt_s,
-                                        (struct Oc_bpt_key*)&lo_key,
-                                        (struct Oc_bpt_key*)&hi_key);
-    }
-    oc_crt_unlock(&g_lock);
-
-    if (*check_eq_pio) {
-        if (!validate_fun())
-            *check_eq_pio = FALSE;
-        if (rc1 != rc2) {
-            printf("mismatch in remove_range lo_key=%lu hi_key=%lu\n",
-                   lo_key, hi_key);
-            *check_eq_pio = FALSE;
-        }
-    }
-
     if (param->verbose && (*check_eq_pio)) {
         if (0 == rc1) printf("    // no keys removed during remove-range\n");
         if (param->verbose) print_fun();
@@ -950,12 +753,6 @@ void oc_bpt_test_utl_btree_clone(
     if (param->verbose) printf("// clone new-TID=%Lu\n", get_tid(trg_p));
 
     oc_bpt_clone_b(wu_p, &src_p->bpt_s, &trg_p->bpt_s);
-    oc_crt_lock_write(&g_lock);
-    {
-        oc_bpt_alt_clone_b(wu_p, &src_p->alt_s, &trg_p->alt_s);
-    }
-    oc_crt_unlock(&g_lock);
-
     if (param->verbose) print_fun();
 }
 
@@ -1035,15 +832,6 @@ void oc_bpt_test_utl_init(void)
     cfg.key_to_string = key_to_string;
     cfg.data_release = data_release;
     cfg.data_to_string = data_to_string;
-
-    memset(&alt_cfg, 0, sizeof(alt_cfg));
-    alt_cfg.key_size = sizeof(Oc_bpt_test_key);
-    alt_cfg.data_size = sizeof(Oc_bpt_test_data);
-    alt_cfg.key_compare = key_compare;
-    alt_cfg.key_inc = key_inc;
-    alt_cfg.key_to_string = key_to_string;
-    alt_cfg.data_release = data_release;
-    alt_cfg.data_to_string = data_to_string;
 
     oc_bpt_init_config(&cfg);
 }

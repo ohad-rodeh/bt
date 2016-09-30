@@ -1,5 +1,4 @@
-bt
-==
+# bt
 
 COW b-trees
 
@@ -12,8 +11,24 @@ The code contains a lot of scaffolding, but the main directory is
 src/oc/bpt. BPT is short for "B Plus Tree". The license is BSD, which
 should allow incorporating the code into other open source and commercial projects.
 
-Directory naming
-================
+### Build & run tests
+
+The project depends on standard Linux tools: `gcc`, `make`, `awk`, `sed`.
+
+In order to compile the project, from the root directory `ROOT`, do:
+```
+cd src
+make all
+```
+
+This will create three directories under `bin`, `lib`, and `obj`. They
+contain generated binaries, libraries, and object files.
+
+The sources for the b-tree tests are in directory `src/oc/bpt/test`. The test
+script that exercises all the tests is `run_tests.sh`.
+
+
+### Directory naming
 
 The src directory contains these sub-directories:
 
@@ -29,8 +44,7 @@ The locking and thread support is currently based on Linux
 pthreads. The name "crt" is due to an
 internal co-routine library that was used prior to this, and never released.
 
-B-tree implementation
-=====================
+### B-tree implementation
 
 Directory oc/bpt holds the core b-tree code, the files are as follows:
 
@@ -60,7 +74,3 @@ visualize test outputs, for example:
 The `Oc_wu` structure that is passed around by the code, describe a
 "work-unit". This is probably equivalent to a transaction in the
 caller code.
-
-TODO
-====
-Revive the XT multi-threaded tests. This is already done for the BTP module.
