@@ -1,0 +1,9 @@
+language: c
+dist: trusty
+
+script:
+  # Report version of Make and GCC
+  - make --version
+  - gcc --version
+  # Build and run unit tests
+  - make all && ./unit_tests.sh
